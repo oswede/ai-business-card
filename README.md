@@ -23,26 +23,44 @@ Contact: psyja3@nottingham.ac.uk
 ### @oswede Oliver Swede (Gitmaster)
 Oliver is the teams gitmaster and is currently responsible for the blog, the app's communication with Watson services as well as assisting Jack with general Unity development.
 
+Contact: psyos4@nottingham.ac.uk
+
 ### @UoNpsydn Daniel Nugent
 Daniel is currently responsible for the design and documentation of the project, and the development of the Watson Conversation prototype.
+
+Contact: psydn@nottingham.ac.uk
 
 ### @YLPan Yanlin Pan
 Pan is currently responsible for the 3D modelling of the avatar along with Lu
 
+Contact: psyyp2@nottingham.ac.uk
+
 ### @Richard-Lu Jinggeng Lu
 Lu is currently responsible for the 3D modelling of the avatar along with Pan
+
+Contact: psyjl10@nottingham.ac.uk
 
 ### @GregoPantelis Pantelis Gregoriades
 Pantelis is currently responsible for researching Vuforia, an AR sdk for Unity
 
-## Supervisor and Sponsor
-### Supervisor Xin Chen
+Contact: psypg1@nottingham.ac.uk
 
-### Sponsor IBM - John McNamara - Senior Inventor and Innovation Centre Technologist Lead
+## Supervisor and Sponsor
+### Supervisor 
+
+Xin Chen
+B37, Computer Science Building
+Contact: xin.chen@nottingham.ac.uk
+
+### Sponsor
+IBM
+John McNamara - Senior Inventor and Innovation Centre Technologist Lead
+Contact: jon_mcnam@uk.ibm.com
 
 ## Requirements
 ### Unity
 
 ## Links
-### Trello
-### Google Drive
+### Trello - https://trello.com/invite/b/hoxwI9Ve/ec3d7a359b8bde9963ddb82d009cda82/ibm-ai-business-card
+### Google Drive - https://drive.google.com/drive/folders/0B_TPLO-MurBoazczV1dQZzRROWs?usp=sharing
+### Slack - https://ibmaibusinesscard.slack.com/
