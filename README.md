@@ -1,5 +1,13 @@
 # AI Business Card
 
+## Messages for Team
+
+Please make all commits to the dev branch and then make a merge request
+
+Everyone needs to have made a contribution by the 15th of December
+
+Please make sure you are in the slack and receiving notifications
+
 ## Project Description
 Our Project is to design and build an intelligent AR Business Card. We will be using Watson Conversations to build a chatbot that guides the user through a conversation about John McNamara, a Senior Inventor and Innovation Centre Technologist Lead at IBM.
 
