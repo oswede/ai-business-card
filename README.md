@@ -7,7 +7,7 @@ The app will allow the user to point their camara at the physical business card.
 
 ## Our Team
 
-### @janshai Jack Adams (Team Leader)
+### @Janshai Jack Adams (Team Leader)
 Jack is the team leader and is currently responsible for general Unity development as well as assisting Oliver with Watson connection and Pantelis with AR/Vuforia integration.
 
 Contact: psyja3@nottingham.ac.uk
@@ -28,7 +28,13 @@ Lu is currently responsible for the 3D modelling of the avatar along with Pan
 Pantelis is currently responsible for researching Vuforia, an AR sdk for Unity
 
 ## Supervisor and Sponsor
+### Supervisor Xin Chen
+
+### Sponsor IBM - John McNamara - Senior Inventor and Innovation Centre Technologist Lead
 
 ## Requirements
+### Unity
 
 ## Links
+### Trello
+### Google Drive
