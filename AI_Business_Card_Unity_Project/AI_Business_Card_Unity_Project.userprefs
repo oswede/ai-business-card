@@ -1,0 +1,12 @@
+﻿<Properties StartupItem="Assembly-CSharp.csproj">
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" PreferredExecutionTarget="Unity.Instance.Unity Editor" />
+  <MonoDevelop.Ide.Workbench ActiveDocument="Assets/mmd-for-unity-proj-mmd-for-unity-de6d097/Editor/MMDLoader/Private/VMDConverter.cs">
+    <Files>
+      <File FileName="Assets/mmd-for-unity-proj-mmd-for-unity-de6d097/Editor/MMDLoader/Private/VMDConverter.cs" Line="556" Column="4" />
+    </Files>
+  </MonoDevelop.Ide.Workbench>
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>
