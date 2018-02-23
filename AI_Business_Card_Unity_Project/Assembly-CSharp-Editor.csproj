@@ -64,7 +64,7 @@
      <None Include="Assets\watson-sdk-2.0.0\Scripts\Editor\Help\Working\StopWordList.txt" />
      <None Include="Assets\Editor\Vuforia\CylinderTargetTextures\VuforiaMars_Images\authoringinfo.xml" />
  <Reference Include="Facebook.Unity.Settings">
- <HintPath>/Users/Jack/Dropbox/Uni/Year2/GRP/ai-business-card/AI_Business_Card_Unity_Project/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
+ <HintPath>/Users/Jack/Documents/GRP/ai-business-card/AI_Business_Card_Unity_Project/Library/FacebookSDK/Facebook.Unity.Settings.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.UI">
  <HintPath>/Applications/Unity/Unity.app/Contents/UnityExtensions/Unity/GUISystem/UnityEngine.UI.dll</HintPath>
@@ -157,7 +157,7 @@
  <HintPath>/Applications/Unity/PlaybackEngines/Facebook/UnityEditor.Facebook.Extensions.dll</HintPath>
  </Reference>
  <Reference Include="websocket-sharp">
- <HintPath>/Users/Jack/Dropbox/Uni/Year2/GRP/ai-business-card/AI_Business_Card_Unity_Project/Assets/watson-sdk-2.0.0/Plugins/websocket-sharp.dll</HintPath>
+ <HintPath>/Users/Jack/Documents/GRP/ai-business-card/AI_Business_Card_Unity_Project/Assets/watson-sdk-2.0.0/Plugins/websocket-sharp.dll</HintPath>
  </Reference>
  <Reference Include="UnityEngine.Advertisements">
  <HintPath>/Users/Jack/Library/Unity/cache/packages/packages.unity.com/com.unity.ads@2.0.3/UnityEngine.Advertisements.dll</HintPath>
