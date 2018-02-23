@@ -30,17 +30,11 @@ public class stt_handler : MonoBehaviour {
 
         LogSystem.InstallDefaultReactors();
 
-        //  Create credential and instantiate service
         Credentials stt_credentials = new Credentials(stt_username, stt_password, stt_url);
-
         _speechToText = new SpeechToText(stt_credentials);
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
-
         finalResponseReceived = false;
-
-
-        //Message(null); // get the initial welcome response
     }
 
     public bool STT_Active

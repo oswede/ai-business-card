@@ -186,7 +186,7 @@ GameObject:
   - component: {fileID: 205334183}
   - component: {fileID: 205334182}
   m_Layer: 5
-  m_Name: stt_to_convo
+  m_Name: stt_output_display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -588,7 +588,7 @@ GameObject:
   - component: {fileID: 1333729870}
   - component: {fileID: 1333729869}
   m_Layer: 5
-  m_Name: convo_to_tts
+  m_Name: convo_output_display
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

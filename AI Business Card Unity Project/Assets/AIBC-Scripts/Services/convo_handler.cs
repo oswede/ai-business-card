@@ -30,6 +30,8 @@ public class convo_handler : MonoBehaviour {
         Credentials convo_credentials = new Credentials(convo_username, convo_password, convo_url);
         _conversation = new Conversation(convo_credentials);
         _conversation.VersionDate = _conversationVersionDate;
+
+        Message(null); // send initial null message to the conversation to get the first response
     }
 
     public void Message(string nextMessage)
@@ -57,6 +59,7 @@ public class convo_handler : MonoBehaviour {
         if (!r.Succeeded)
             throw new WatsonException(r.FormattedMessages);
 
+        // Extract response from output
         if (resp != null && (messageResponse.output.text.Length > 0))
         {
             convo_output = "";
