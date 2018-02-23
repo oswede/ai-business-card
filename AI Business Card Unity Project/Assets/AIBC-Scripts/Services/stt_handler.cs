@@ -1,26 +1,16 @@
-﻿using UnityEngine;
-using System.Collections;
-using IBM.Watson.DeveloperCloud.Logging;
-using IBM.Watson.DeveloperCloud.Services.SpeechToText.v1;
-using IBM.Watson.DeveloperCloud.Services.Conversation.v1;
-using IBM.Watson.DeveloperCloud.Services.TextToSpeech.v1;
-using IBM.Watson.DeveloperCloud.Utilities;
-using IBM.Watson.DeveloperCloud.DataTypes;
+﻿using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
+using IBM.Watson.DeveloperCloud.Services.SpeechToText.v1;
+using IBM.Watson.DeveloperCloud.Logging;
+using IBM.Watson.DeveloperCloud.Utilities;
 using UnityEngine.UI;
+using IBM.Watson.DeveloperCloud.DataTypes;
 
-using FullSerializer;
-using IBM.Watson.DeveloperCloud.Connection;
+public class stt_handler : MonoBehaviour {
 
-// this is an example of hwo to take the input, send it to the conversation, send that response to speech to text, and output the result
-// also display the speech to text result at the top, and also the conversation output result at the bottom
-
-public class ServiceTest : MonoBehaviour
-{
-
-    /*Speech to text stuff */
-    public AudioClip stt_input; // input to the speech to text
     private SpeechToText _speechToText;
+
     private string stt_username = "8f137eeb-cb17-47d4-afea-36b21f6982f0";
     private string stt_password = "tMawRjCtV56K";
     private string stt_url = "https://stream.watsonplatform.net/speech-to-text/api";
@@ -31,59 +21,28 @@ public class ServiceTest : MonoBehaviour
     private int _recordingBufferSize = 1;
     private int _recordingHZ = 22050;
 
-    private string stt_output; // output of the speech to text to send to conversation
-    public Text stt_to_convo; // display output of the speech to text
+    private string stt_output;
+    public Text stt_output_display; // display the speach to text as the responses are being received
 
-    /* Conversation stuff */
-    private Conversation _conversation;
-    private string convo_username = "fc30b2dc-b2e7-4358-b5e9-1c40aec50a7e";
-    private string convo_password = "UZiUgW3HcVCG";
-    private string convo_url = "https://gateway.watsonplatform.net/conversation/api";
-    private string convo_workspaceId = "82021a7f-243d-4060-88d1-612d5bf7d963";
-    private string _conversationVersionDate = "2018-02-21";
+    private bool finalResponseReceived;
 
-    private fsSerializer _serializer = new fsSerializer();
-    private Dictionary<string, object> _context = null;
+    void Start () {
 
-    private string convo_output; // output of the conversation to
-    public Text convo_to_tts; // display conversation output
-
-    private TextToSpeech _textToSpeech;
-    private string tts_username = "";
-    private string tts_password = "";
-    private string tts_url = "";
-
-    private List<AudioClip> responses; //maybe to be used to store the previous speech to text conversions if it needs to revert back to an older one
-
-    public AudioClip tts_output; // output from the text to speech
-
-    void Start()
-    {
         LogSystem.InstallDefaultReactors();
 
         //  Create credential and instantiate service
         Credentials stt_credentials = new Credentials(stt_username, stt_password, stt_url);
-        Credentials convo_credentials = new Credentials(convo_username, convo_password, convo_url);
 
         _speechToText = new SpeechToText(stt_credentials);
-        _conversation = new Conversation(convo_credentials);
-        _conversation.VersionDate = _conversationVersionDate;
-
-        stt_to_convo = GameObject.Find("stt_to_convo").GetComponent<Text>();
-        convo_to_tts = GameObject.Find("convo_to_tts").GetComponent<Text>();
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
 
-        Message(null); // get the initial welcome response
+        finalResponseReceived = false;
+
+
+        //Message(null); // get the initial welcome response
     }
 
-    public void Go()
-    {
-        StartRecording();
-    }
-
-
-    /* Methods for the Speech to Text" */
     public bool STT_Active
     {
         get { return _speechToText.IsListening; }
@@ -112,10 +71,12 @@ public class ServiceTest : MonoBehaviour
         }
     }
 
-    private void StartRecording()
+    public void StartRecording()
     {
         if (_recordingRoutine == 0)
         {
+            finalResponseReceived = false; // reset final response flag
+
             UnityObjectUtil.StartDestroyQueue();
             _recordingRoutine = Runnable.Run(RecordingHandler());
         }
@@ -206,12 +167,11 @@ public class ServiceTest : MonoBehaviour
                     //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
                     stt_output = string.Format("{0}", alt.transcript);
                     Log.Debug("STT.OnRecognize()", stt_output);
-                    stt_to_convo.text = stt_output;                   
+                    stt_output_display.text = stt_output; // display the last received result
 
-                    // if it's the final result, set received to true
                     if (res.final)
                     {
-                        Message(stt_output);
+                        finalResponseReceived = true;
                     }
 
                 }
@@ -248,44 +208,24 @@ public class ServiceTest : MonoBehaviour
         }
     }
 
-    /* Methods for the Conversation */
-    private void Message(string nextMessage)
+    public bool hasNextFinalResponse()
     {
-        if (!_conversation.Message(OnMessageSuccess, OnMessageFail, convo_workspaceId, nextMessage))
-        {
-            Log.Debug("CONVO.Message()", "Failed to message!");
-        }
+        return finalResponseReceived;
     }
 
-    private void OnMessageSuccess(object resp, Dictionary<string, object> customData)
+    public void waitForNextFinalResponse()
     {
-        Log.Debug("CONVO.OnMessage()", "Conversation: Message Response: {0}", customData["json"].ToString());
-
-        //  Convert resp to fsdata
-        fsData fsdata = null;
-        fsResult r = _serializer.TrySerialize(resp.GetType(), resp, out fsdata);
-        if (!r.Succeeded)
-            throw new WatsonException(r.FormattedMessages);
-
-        //  Convert fsdata to MessageResponse
-        MessageResponse messageResponse = new MessageResponse();
-        object obj = messageResponse;
-        r = _serializer.TryDeserialize(fsdata, obj.GetType(), ref obj);
-        if (!r.Succeeded)
-            throw new WatsonException(r.FormattedMessages);
-
-        if (resp != null && (messageResponse.output.text.Length > 0))
-        {
-            string output = messageResponse.output.text[0];
-
-            Debug.Log("Output: " + output);
-        }
-
+        finalResponseReceived = false;
     }
 
-    private void OnMessageFail(RESTConnector.Error error, Dictionary<string, object> customData)
+    public bool isRecording()
     {
-        Log.Error("CONVO.HandleFail()", "Error received: {0}", error.ToString());
+        return (_recordingRoutine != 0); // if recording routine != 0, then it is recording (mic is active) - STT is still connected even if recordingroutine == 0.
+    }
+
+    public string getSttOutput()
+    {
+        return stt_output;
     }
 
 }
