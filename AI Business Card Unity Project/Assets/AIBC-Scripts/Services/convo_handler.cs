@@ -23,6 +23,8 @@ public class convo_handler : MonoBehaviour {
     private string convo_output; // output of the conversation to
     public Text convo_output_display; // display conversation output
 
+    private bool convoResponseReceived;
+
     void Start () {
 
         LogSystem.InstallDefaultReactors();
@@ -30,6 +32,8 @@ public class convo_handler : MonoBehaviour {
         Credentials convo_credentials = new Credentials(convo_username, convo_password, convo_url);
         _conversation = new Conversation(convo_credentials);
         _conversation.VersionDate = _conversationVersionDate;
+
+        convoResponseReceived = false;
 
         Message(null); // send initial null message to the conversation to get the first response
     }
@@ -72,11 +76,28 @@ public class convo_handler : MonoBehaviour {
             convo_output_display.text = convo_output;
         }
 
+        convoResponseReceived = true;
+
     }
 
     private void OnMessageFail(RESTConnector.Error error, Dictionary<string, object> customData)
     {
         Log.Error("CONVO.HandleFail()", "Error received: {0}", error.ToString());
+    }
+
+    public string getLastConvoOutput()
+    {
+        return convo_output;
+    }
+
+    public bool hasNextConvoResponse()
+    {
+        return convoResponseReceived;
+    }
+
+    public void waitForNextConvoResponse()
+    {
+        convoResponseReceived = false;
     }
 
 }

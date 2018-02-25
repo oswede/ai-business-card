@@ -24,7 +24,7 @@ public class stt_handler : MonoBehaviour {
     private string stt_output;
     public Text stt_output_display; // display the speach to text as the responses are being received
 
-    private bool finalResponseReceived;
+    private bool sttResponseReceived;
 
     void Start () {
 
@@ -34,7 +34,7 @@ public class stt_handler : MonoBehaviour {
         _speechToText = new SpeechToText(stt_credentials);
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
-        finalResponseReceived = false;
+        sttResponseReceived = false;
     }
 
     public bool STT_Active
@@ -69,7 +69,7 @@ public class stt_handler : MonoBehaviour {
     {
         if (_recordingRoutine == 0)
         {
-            finalResponseReceived = false; // reset final response flag
+            sttResponseReceived = false; // reset final response flag
 
             UnityObjectUtil.StartDestroyQueue();
             _recordingRoutine = Runnable.Run(RecordingHandler());
@@ -165,7 +165,7 @@ public class stt_handler : MonoBehaviour {
 
                     if (res.final)
                     {
-                        finalResponseReceived = true;
+                        sttResponseReceived = true;
                     }
 
                 }
@@ -202,14 +202,14 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    public bool hasNextFinalResponse()
+    public bool hasNextSttResponse()
     {
-        return finalResponseReceived;
+        return sttResponseReceived;
     }
 
-    public void waitForNextFinalResponse()
+    public void waitForNextSttResponse()
     {
-        finalResponseReceived = false;
+        sttResponseReceived = false;
     }
 
     public bool isRecording()

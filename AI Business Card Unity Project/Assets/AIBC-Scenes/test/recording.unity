@@ -517,9 +517,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 24944c9b887e7b8419d815fcc7a3e092, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  tts: {fileID: 1726893476}
   stt: {fileID: 1106317274}
   convo: {fileID: 2005619078}
-  tts: {fileID: 1570584536}
 --- !u!4 &1020255949
 Transform:
   m_ObjectHideFlags: 0
@@ -532,7 +532,7 @@ Transform:
   m_Children:
   - {fileID: 1106317275}
   - {fileID: 2005619079}
-  - {fileID: 1570584537}
+  - {fileID: 1726893477}
   m_Father: {fileID: 0}
   m_RootOrder: 4
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -651,15 +651,15 @@ CanvasRenderer:
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 1333729867}
---- !u!1 &1570584535
+--- !u!1 &1726893475
 GameObject:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
   serializedVersion: 5
   m_Component:
-  - component: {fileID: 1570584537}
-  - component: {fileID: 1570584536}
+  - component: {fileID: 1726893477}
+  - component: {fileID: 1726893476}
   m_Layer: 0
   m_Name: tts_handler
   m_TagString: Untagged
@@ -667,23 +667,23 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1570584536
+--- !u!114 &1726893476
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1570584535}
+  m_GameObject: {fileID: 1726893475}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 55b392723b1566148a16912db805d28b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!4 &1570584537
+--- !u!4 &1726893477
 Transform:
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_GameObject: {fileID: 1570584535}
+  m_GameObject: {fileID: 1726893475}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
