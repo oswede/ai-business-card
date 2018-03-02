@@ -24,7 +24,7 @@ public class stt_handler : MonoBehaviour {
     private string stt_output;
     public Text stt_output_display; // display the speach to text as the responses are being received
 
-    private bool sttResponseReceived;
+    private bool sttResponseReceived = false;
 
     void Start () {
 
@@ -34,7 +34,7 @@ public class stt_handler : MonoBehaviour {
         _speechToText = new SpeechToText(stt_credentials);
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
-        sttResponseReceived = false;
+        //sttResponseReceived = false;
     }
 
     public bool STT_Active

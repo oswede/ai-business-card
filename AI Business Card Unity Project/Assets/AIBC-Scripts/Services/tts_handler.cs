@@ -15,12 +15,15 @@ public class tts_handler : MonoBehaviour {
     private string tts_password = "kURHMaq8hmyr";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
-    private bool _synthesizeTested = false;
+    private bool ttsResponseReceived;
+
+    private AudioClip lastClip;
+
+    private bool isPlaying;
 
     //private string tts_output;
 
     void Start () {
-
         LogSystem.InstallDefaultReactors();
 
         Credentials credentials = new Credentials(tts_username, tts_password, tts_url);
@@ -28,6 +31,9 @@ public class tts_handler : MonoBehaviour {
 
         _textToSpeech.Voice = VoiceType.en_GB_Kate;
         //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed
+
+        ttsResponseReceived = false;
+        isPlaying = false;
     }
 
     public void Synthesize(string input)
@@ -40,7 +46,9 @@ public class tts_handler : MonoBehaviour {
 
     private void OnSynthesize(AudioClip clip, Dictionary<string, object> customData)
     {
-        PlayClip(clip);
+        lastClip = clip;
+        ttsResponseReceived = true;
+        //PlayClip(clip);
     }
 
     private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
@@ -48,10 +56,26 @@ public class tts_handler : MonoBehaviour {
         Log.Error("TTS.OnFail()", "Error received: {0}", error.ToString());
     }
 
+    public AudioClip getLastTtsResponse()
+    {
+        return lastClip;
+    }
+
+    public bool hasNextTtsResponse()
+    {
+        return ttsResponseReceived;
+    }
+
+    public void waitForNextTtsResponse()
+    {
+        ttsResponseReceived = false;
+    }
+
     private void PlayClip(AudioClip clip)
     {
         if (Application.isPlaying && clip != null)
         {
+
             GameObject audioObject = new GameObject("AudioObject");
             AudioSource source = audioObject.AddComponent<AudioSource>();
             source.spatialBlend = 0.0f;

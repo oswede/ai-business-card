@@ -1,9 +1,11 @@
 ﻿
-Microsoft Visual Studio Solution File, Format Version 11.00
-# Visual Studio 2010
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI Business Card Unity Project", "Assembly-CSharp.csproj", "{57544793-B295-9E20-9CE1-2D7775972B54}"
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2017
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI Business Card Unity Project", "AI Business Card Unity Project.csproj", "{315F8CC3-2415-D834-FFCF-69B06F4296FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI Business Card Unity Project", "Assembly-CSharp-Editor.csproj", "{194CB3FC-E333-64FA-70B5-0F586A4D4275}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Unity.PackageManagerUI.Editor", "Unity.PackageManagerUI.Editor.csproj", "{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AI Business Card Unity Project.Editor", "AI Business Card Unity Project.Editor.csproj", "{D6D9182D-F827-64D6-16E3-34C656D4042C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -11,19 +13,20 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{57544793-B295-9E20-9CE1-2D7775972B54}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{57544793-B295-9E20-9CE1-2D7775972B54}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{57544793-B295-9E20-9CE1-2D7775972B54}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{57544793-B295-9E20-9CE1-2D7775972B54}.Release|Any CPU.Build.0 = Release|Any CPU
-		{194CB3FC-E333-64FA-70B5-0F586A4D4275}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{194CB3FC-E333-64FA-70B5-0F586A4D4275}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{194CB3FC-E333-64FA-70B5-0F586A4D4275}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{194CB3FC-E333-64FA-70B5-0F586A4D4275}.Release|Any CPU.Build.0 = Release|Any CPU
+		{315F8CC3-2415-D834-FFCF-69B06F4296FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{315F8CC3-2415-D834-FFCF-69B06F4296FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{315F8CC3-2415-D834-FFCF-69B06F4296FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{315F8CC3-2415-D834-FFCF-69B06F4296FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6877705C-FBD9-0C4F-5AFB-6FB431E5D39D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6D9182D-F827-64D6-16E3-34C656D4042C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6D9182D-F827-64D6-16E3-34C656D4042C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6D9182D-F827-64D6-16E3-34C656D4042C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6D9182D-F827-64D6-16E3-34C656D4042C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(MonoDevelopProperties) = preSolution
-		StartupItem = Assembly-CSharp.csproj
 	EndGlobalSection
 EndGlobal
