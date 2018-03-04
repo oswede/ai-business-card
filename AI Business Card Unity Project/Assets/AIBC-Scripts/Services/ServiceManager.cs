@@ -14,12 +14,14 @@ public class ServiceManager : MonoBehaviour {
 
     public AudioSource ttsAudioSource;
 
+    private bool loggingResumed;
+
     //public AudioClip lastClip;
     //public Text convo_output_display;
 
 	void Start () {
-        stt.StartRecording();
-        stt.StopRecording();
+        // automatically set: sst.StartRecording(), logging = false
+        loggingResumed = false;
     }
 
     // Update is called once per frame
@@ -29,9 +31,8 @@ public class ServiceManager : MonoBehaviour {
         if (stt.hasNextSttResponse()) // check to see if the final response has been received each frame. It automatically stops recording immediately if this is the case.
         {
             Debug.Log("one");
-            //stt.StopLogging();
-            stt.waitForNextSttResponse(); // set it to false immediately after
-            stt.StopRecording();
+            stt.waitForNextSttResponse(); // set it responseReceived to false
+            //stt.StopLogging(); // called within stt_handler when the response is received instead. Once the final response has been received, stop updating the last output.
 
             string stt_output = stt.getSttOutput(); // fetch last message
             convo.Message(stt_output);
@@ -48,12 +49,13 @@ public class ServiceManager : MonoBehaviour {
             tts.waitForNextTtsResponse(); // set to false immediately after
             PlayClip(tts.getLastTtsResponse());
             //lastClip = tts.getLastTtsResponse();
+            loggingResumed = false;
         }
-        else if (!ttsAudioSource.isPlaying && (ttsAudioSource.clip != null) && !stt.isRecording()) // the service routine has finished, and the received clip has finished playing
+        else if (!ttsAudioSource.isPlaying && (ttsAudioSource.clip != null) && !loggingResumed) // the service routine has finished, and the received clip has finished playing
         {
             Debug.Log("four");
-            //stt.StartLogging();
-            stt.StartRecording();
+            stt.StartLogging();
+            loggingResumed = true;
         }
 
     }
@@ -64,16 +66,6 @@ public class ServiceManager : MonoBehaviour {
         {
             ttsAudioSource.clip = clip;
             ttsAudioSource.Play();
-            /*
-            GameObject audioObject = new GameObject("AudioObject");
-            AudioSource source = audioObject.AddComponent<AudioSource>();
-            source.spatialBlend = 0.0f;
-            source.loop = false;
-            source.clip = clip;
-            source.Play();
-
-            Destroy(audioObject, clip.length);
-        */
         }
 
     }

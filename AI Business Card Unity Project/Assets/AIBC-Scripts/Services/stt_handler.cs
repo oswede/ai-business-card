@@ -26,7 +26,7 @@ public class stt_handler : MonoBehaviour {
 
     private bool sttResponseReceived;
 
-    //private bool logResponse;
+    private bool loggingResponse;
 
     void Start () {
 
@@ -37,7 +37,9 @@ public class stt_handler : MonoBehaviour {
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
         sttResponseReceived = false;
-        //logResponse = false;
+        loggingResponse = false;
+
+        StartRecording();
     }
 
     public bool STT_Active
@@ -68,7 +70,7 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    public void StartRecording()
+    private void StartRecording()
     {
         if (_recordingRoutine == 0)
         {
@@ -79,7 +81,7 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    public void StopRecording()
+    private void StopRecording()
     {
         if (_recordingRoutine != 0)
         {
@@ -155,60 +157,49 @@ public class stt_handler : MonoBehaviour {
 
     private void OnRecognize(SpeechRecognitionEvent result)
     {
-        if (result != null && result.results.Length > 0)
+        if (loggingResponse)
         {
-            foreach (var res in result.results)
+
+
+            if (result != null && result.results.Length > 0)
             {
-                foreach (var alt in res.alternatives)
+                foreach (var res in result.results)
                 {
-
-                    //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
-                    stt_output = string.Format("{0}", alt.transcript);
-                    Log.Debug("STT.OnRecognize()", stt_output);
-                    stt_output_display.text = stt_output; // display the last received result
-
-                    if (res.final)
-                    {
-                        sttResponseReceived = true;
-                    }
-
-
-                    /*
-                    if (logResponse && !sttResponseReceived)
+                    foreach (var alt in res.alternatives)
                     {
                         //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
                         stt_output = string.Format("{0}", alt.transcript);
                         Log.Debug("STT.OnRecognize()", stt_output);
                         stt_output_display.text = stt_output; // display the last received result
-
                         
                         if (res.final)
                         {
                             sttResponseReceived = true;
-                            logResponse = false; // final response received, so stop logging
+                            StopLogging(); // final response received, so stop logging
+                        }
+
+                    }
+
+                    if (res.keywords_result != null && res.keywords_result.keyword != null)
+                    {
+                        foreach (var keyword in res.keywords_result.keyword)
+                        {
+                            Log.Debug("STT.OnRecognize()", "keyword: {0}, confidence: {1}, start time: {2}, end time: {3}", keyword.normalized_text, keyword.confidence, keyword.start_time, keyword.end_time);
                         }
                     }
-                    */
 
-                }
-
-                if (res.keywords_result != null && res.keywords_result.keyword != null)
-                {
-                    foreach (var keyword in res.keywords_result.keyword)
+                    if (res.word_alternatives != null)
                     {
-                        Log.Debug("STT.OnRecognize()", "keyword: {0}, confidence: {1}, start time: {2}, end time: {3}", keyword.normalized_text, keyword.confidence, keyword.start_time, keyword.end_time);
+                        foreach (var wordAlternative in res.word_alternatives)
+                        {
+                            Log.Debug("STT.OnRecognize()", "Word alternatives found. Start time: {0} | EndTime: {1}", wordAlternative.start_time, wordAlternative.end_time);
+                            foreach (var alternative in wordAlternative.alternatives)
+                                Log.Debug("STT.OnRecognize()", "\t word: {0} | confidence: {1}", alternative.word, alternative.confidence);
+                        }
                     }
                 }
 
-                if (res.word_alternatives != null)
-                {
-                    foreach (var wordAlternative in res.word_alternatives)
-                    {
-                        Log.Debug("STT.OnRecognize()", "Word alternatives found. Start time: {0} | EndTime: {1}", wordAlternative.start_time, wordAlternative.end_time);
-                        foreach (var alternative in wordAlternative.alternatives)
-                            Log.Debug("STT.OnRecognize()", "\t word: {0} | confidence: {1}", alternative.word, alternative.confidence);
-                    }
-                }
+
             }
         }
     }
@@ -244,30 +235,21 @@ public class stt_handler : MonoBehaviour {
         return stt_output;
     }
 
-    /*
-
     public void StartLogging()
     {
         // keep updating the stored last result
-        logResponse = true;
-        stt_output = "";
-        stt_output_display.text = "";
-        //StopRecording();
-        StartRecording();
+        loggingResponse = true;
     }
 
     public void StopLogging()
     {
         // stop logigng the last stored result
-        logResponse = false;
-        StopRecording();
+        loggingResponse = false;
     }
 
     public bool isLogging()
     {
-        return logResponse;
+        return loggingResponse;
     }
-
-    */
 
 }

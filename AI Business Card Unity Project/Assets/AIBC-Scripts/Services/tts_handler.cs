@@ -71,6 +71,7 @@ public class tts_handler : MonoBehaviour {
     }
 
     /* Moved to ServiceManager */
+    /*
     private void PlayClip(AudioClip clip)
     {
         if (Application.isPlaying && clip != null)
@@ -86,5 +87,6 @@ public class tts_handler : MonoBehaviour {
             Destroy(audioObject, clip.length);
         }
     }
+    */
 
 }
