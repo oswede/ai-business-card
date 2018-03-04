@@ -11,8 +11,8 @@ public class tts_handler : MonoBehaviour {
 
     private TextToSpeech _textToSpeech;
 
-    private string tts_username = "23225016-db41-4a1a-bccc-af5a34d26e86";
-    private string tts_password = "kURHMaq8hmyr";
+    private string tts_username = "7c903886-153a-44b0-ad64-26081c1a5910";
+    private string tts_password = "65IXm0UXkZr8";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
     private bool ttsResponseReceived;
@@ -30,7 +30,8 @@ public class tts_handler : MonoBehaviour {
         _textToSpeech = new TextToSpeech(credentials);
 
         _textToSpeech.Voice = VoiceType.en_GB_Kate;
-        //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed
+
+        //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed - currently not working
 
         ttsResponseReceived = false;
         isPlaying = false;
@@ -38,8 +39,6 @@ public class tts_handler : MonoBehaviour {
 
     public void Synthesize(string input)
     {
-        TextToSpeech t = new TextToSpeech(new Credentials(tts_username, tts_password, tts_url));
-
         if (!_textToSpeech.ToSpeech(OnSynthesize, OnFail, input))
             Log.Debug("TTS.ToSpeech()", "Failed to synthesize!");
     }
@@ -48,7 +47,7 @@ public class tts_handler : MonoBehaviour {
     {
         lastClip = clip;
         ttsResponseReceived = true;
-        //PlayClip(clip);
+        //PlayClip(clip); //now handled by ServiceManager
     }
 
     private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
@@ -71,6 +70,7 @@ public class tts_handler : MonoBehaviour {
         ttsResponseReceived = false;
     }
 
+    /* Moved to ServiceManager */
     private void PlayClip(AudioClip clip)
     {
         if (Application.isPlaying && clip != null)

@@ -12,65 +12,59 @@ public class ServiceManager : MonoBehaviour {
     public convo_handler convo; // component referenced in scene
     public tts_handler tts; // component referenced in scene
 
-    private bool isPlaying;
+    public AudioSource ttsAudioSource;
 
     //public AudioClip lastClip;
-
-    // public Text convo_output_display;
+    //public Text convo_output_display;
 
 	void Start () {
-        // initialise conversation
-        // initialise text to speech
-        // initisalise speech to text
-        isPlaying = false;
-        //stt.StartRecording();
-
-        //tts2 = GameObject.Find("tts_handler").GetComponent<tts_handler>();
-        //tts2.Synthesize();
+        stt.StartRecording();
+        stt.StopRecording();
     }
-	
-	// Update is called once per frame
-	void Update () {
 
-        if (convo.hasNextConvoResponse())
-        {
-            convo.waitForNextConvoResponse(); // set to false immediately after
-            tts.Synthesize(convo.getLastConvoOutput());
-        }
-
-        if (tts.hasNextTtsResponse())
-        {
-            tts.waitForNextTtsResponse();
-
-            PlayClip(tts.getLastTtsResponse());
-            stt.StartRecording();
-            //lastClip = tts.getLastTtsResponse();
-        }
+    // Update is called once per frame
+    void Update()
+    {
 
         if (stt.hasNextSttResponse()) // check to see if the final response has been received each frame. It automatically stops recording immediately if this is the case.
         {
-            Debug.Log("here (shouldn't be)");
+            Debug.Log("one");
+            //stt.StopLogging();
             stt.waitForNextSttResponse(); // set it to false immediately after
-            //stt.StopRecording();
+            stt.StopRecording();
+
             string stt_output = stt.getSttOutput(); // fetch last message
             convo.Message(stt_output);
         }
-
-
-        /*
-        if (!isPlaying)
+        else if (convo.hasNextConvoResponse())
         {
+            Debug.Log("two");
+            convo.waitForNextConvoResponse(); // set to false immediately after
+            tts.Synthesize(convo.getLastConvoOutput());
+        }
+        else if (tts.hasNextTtsResponse())
+        {
+            Debug.Log("three");
+            tts.waitForNextTtsResponse(); // set to false immediately after
+            PlayClip(tts.getLastTtsResponse());
+            //lastClip = tts.getLastTtsResponse();
+        }
+        else if (!ttsAudioSource.isPlaying && (ttsAudioSource.clip != null) && !stt.isRecording()) // the service routine has finished, and the received clip has finished playing
+        {
+            Debug.Log("four");
+            //stt.StartLogging();
             stt.StartRecording();
         }
-        */
 
-	}
+    }
 
     private void PlayClip(AudioClip clip)
     {
         if (Application.isPlaying && clip != null)
         {
-            isPlaying = true;
+            ttsAudioSource.clip = clip;
+            ttsAudioSource.Play();
+            /*
             GameObject audioObject = new GameObject("AudioObject");
             AudioSource source = audioObject.AddComponent<AudioSource>();
             source.spatialBlend = 0.0f;
@@ -79,10 +73,8 @@ public class ServiceManager : MonoBehaviour {
             source.Play();
 
             Destroy(audioObject, clip.length);
-
-            isPlaying = false;
+        */
         }
+
     }
-
-
 }

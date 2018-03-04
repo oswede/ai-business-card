@@ -12,7 +12,7 @@ using Vuforia;
 /// <summary>
 ///     A custom handler that registers for Vuforia initialization errors
 /// </summary>
-public class DefaultInitializationErrorHandler : VuforiaMonoBehaviour
+public class DefaultInitializationErrorHandler : MonoBehaviour
 {
     #region Vuforia_lifecycle_events
 

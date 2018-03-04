@@ -11,8 +11,8 @@ public class stt_handler : MonoBehaviour {
 
     private SpeechToText _speechToText;
 
-    private string stt_username = "8f137eeb-cb17-47d4-afea-36b21f6982f0";
-    private string stt_password = "tMawRjCtV56K";
+    private string stt_username = "9f80a08d-1e86-4088-8c54-dc58fb463243";
+    private string stt_password = "X6r11BwZe6xu";
     private string stt_url = "https://stream.watsonplatform.net/speech-to-text/api";
 
     private int _recordingRoutine = 0;
@@ -24,7 +24,9 @@ public class stt_handler : MonoBehaviour {
     private string stt_output;
     public Text stt_output_display; // display the speach to text as the responses are being received
 
-    private bool sttResponseReceived = false;
+    private bool sttResponseReceived;
+
+    //private bool logResponse;
 
     void Start () {
 
@@ -34,7 +36,8 @@ public class stt_handler : MonoBehaviour {
         _speechToText = new SpeechToText(stt_credentials);
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
-        //sttResponseReceived = false;
+        sttResponseReceived = false;
+        //logResponse = false;
     }
 
     public bool STT_Active
@@ -158,6 +161,7 @@ public class stt_handler : MonoBehaviour {
             {
                 foreach (var alt in res.alternatives)
                 {
+
                     //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
                     stt_output = string.Format("{0}", alt.transcript);
                     Log.Debug("STT.OnRecognize()", stt_output);
@@ -167,6 +171,24 @@ public class stt_handler : MonoBehaviour {
                     {
                         sttResponseReceived = true;
                     }
+
+
+                    /*
+                    if (logResponse && !sttResponseReceived)
+                    {
+                        //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
+                        stt_output = string.Format("{0}", alt.transcript);
+                        Log.Debug("STT.OnRecognize()", stt_output);
+                        stt_output_display.text = stt_output; // display the last received result
+
+                        
+                        if (res.final)
+                        {
+                            sttResponseReceived = true;
+                            logResponse = false; // final response received, so stop logging
+                        }
+                    }
+                    */
 
                 }
 
@@ -221,5 +243,31 @@ public class stt_handler : MonoBehaviour {
     {
         return stt_output;
     }
+
+    /*
+
+    public void StartLogging()
+    {
+        // keep updating the stored last result
+        logResponse = true;
+        stt_output = "";
+        stt_output_display.text = "";
+        //StopRecording();
+        StartRecording();
+    }
+
+    public void StopLogging()
+    {
+        // stop logigng the last stored result
+        logResponse = false;
+        StopRecording();
+    }
+
+    public bool isLogging()
+    {
+        return logResponse;
+    }
+
+    */
 
 }
