@@ -40,14 +40,34 @@ public class convo_handler : MonoBehaviour {
 
     public void Message(string nextMessage)
     {
-        if (!_conversation.Message(OnMessageSuccess, OnMessageFail, convo_workspaceId, nextMessage))
+        MessageRequest messageRequest = new MessageRequest()
+        {
+            input = new Dictionary<string, object>()
+            {
+                { "text", nextMessage }
+            },
+            context = _context
+        };
+
+        if (!_conversation.Message(OnMessageSuccess, OnMessageFail, convo_workspaceId, messageRequest))
         {
             Log.Debug("CONVO.Message()", "Failed to message!");
         }
     }
 
+
     private void OnMessageSuccess(object resp, Dictionary<string, object> customData)
     {
+
+        object _tempContext = null;
+        (resp as Dictionary<string, object>).TryGetValue("context", out _tempContext);
+
+        if (_tempContext != null)
+            _context = _tempContext as Dictionary<string, object>;
+        else
+            Log.Debug("ExampleConversation.OnMessageSuccess()", "Failed to get context");
+
+
         Log.Debug("CONVO.OnMessage()", "Conversation: Message Response: {0}", customData["json"].ToString());
 
         //  Convert resp to fsdata
