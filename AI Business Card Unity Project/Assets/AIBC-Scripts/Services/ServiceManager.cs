@@ -16,6 +16,8 @@ public class ServiceManager : MonoBehaviour {
 
     private bool loggingResumed;
 
+    public Text speakIndicator;
+
     double timer = 0.0; // begins at this value
     double timerMax = 3.0; // event occurs at this value
 
@@ -26,6 +28,9 @@ public class ServiceManager : MonoBehaviour {
         // automatically set: sst.StartRecording(), logging = false
         loggingResumed = false;
         //isWaiting = false;
+
+        speakIndicator.text = "Stop Talking";
+        speakIndicator.color = new Color32(189, 0, 0, 0xFF);
     }
 
     // Update is called once per frame
@@ -35,6 +40,9 @@ public class ServiceManager : MonoBehaviour {
         if (stt.hasNextSttResponse() && (timer == 0.0)) // check to see if the final response has been received each frame. It automatically stops recording immediately if this is the case.
         {
             Debug.Log("one");
+
+            speakIndicator.text = "Stop Talking";
+            speakIndicator.color = new Color32(189, 0, 0, 0xFF);
 
             stt.waitForNextSttResponse(); // set it responseReceived to false
             //stt.StopLogging(); // called within stt_handler when the response is received instead. Once the final response has been received, stop updating the last output.
@@ -70,6 +78,8 @@ public class ServiceManager : MonoBehaviour {
 
                 stt.StartLogging();
                 loggingResumed = true;
+                speakIndicator.text = "Start Talking";
+                speakIndicator.color = new Color32(0, 104, 0, 0xFF);
 
                 timer = 0;
 
