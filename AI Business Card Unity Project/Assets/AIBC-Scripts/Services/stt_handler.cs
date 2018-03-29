@@ -11,8 +11,8 @@ public class stt_handler : MonoBehaviour {
 
     private SpeechToText _speechToText;
 
-    private string stt_username = "9f80a08d-1e86-4088-8c54-dc58fb463243";
-    private string stt_password = "X6r11BwZe6xu";
+    private string stt_username = "d3fd4338-e6cd-45d0-b5ee-b68cf4c7d7cd";
+    private string stt_password = "WPXWmQPKN1Mi";
     private string stt_url = "https://stream.watsonplatform.net/speech-to-text/api";
 
     private int _recordingRoutine = 0;
@@ -61,6 +61,7 @@ public class stt_handler : MonoBehaviour {
                 _speechToText.SmartFormatting = true;
                 _speechToText.SpeakerLabels = false;
                 _speechToText.WordAlternativesThreshold = null;
+                
                 _speechToText.StartListening(OnRecognize, OnRecognizeSpeaker);
             }
             else if (!value && _speechToText.IsListening) // if listening and set to false, stop listening
@@ -70,7 +71,7 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    private void StartRecording()
+    public void StartRecording()
     {
         if (_recordingRoutine == 0)
         {
@@ -81,7 +82,7 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    private void StopRecording()
+    public void StopRecording()
     {
         if (_recordingRoutine != 0)
         {
@@ -238,6 +239,8 @@ public class stt_handler : MonoBehaviour {
     public void StartLogging()
     {
         // keep updating the stored last result
+        stt_output = ""; // reset from the previous output
+        stt_output_display.text = stt_output;
         loggingResponse = true;
     }
 

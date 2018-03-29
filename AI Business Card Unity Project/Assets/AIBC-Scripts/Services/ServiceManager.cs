@@ -16,21 +16,26 @@ public class ServiceManager : MonoBehaviour {
 
     private bool loggingResumed;
 
-    //public AudioClip lastClip;
-    //public Text convo_output_display;
+    double timer = 0.0; // begins at this value
+    double timerMax = 3.0; // event occurs at this value
 
-	void Start () {
+        //public AudioClip lastClip;
+        //public Text convo_output_display;
+
+        void Start () {
         // automatically set: sst.StartRecording(), logging = false
         loggingResumed = false;
+        //isWaiting = false;
     }
 
     // Update is called once per frame
     void Update()
     {
 
-        if (stt.hasNextSttResponse()) // check to see if the final response has been received each frame. It automatically stops recording immediately if this is the case.
+        if (stt.hasNextSttResponse() && (timer == 0.0)) // check to see if the final response has been received each frame. It automatically stops recording immediately if this is the case.
         {
             Debug.Log("one");
+
             stt.waitForNextSttResponse(); // set it responseReceived to false
             //stt.StopLogging(); // called within stt_handler when the response is received instead. Once the final response has been received, stop updating the last output.
 
@@ -53,9 +58,23 @@ public class ServiceManager : MonoBehaviour {
         }
         else if (!ttsAudioSource.isPlaying && (ttsAudioSource.clip != null) && !loggingResumed) // the service routine has finished, and the received clip has finished playing
         {
-            Debug.Log("four");
-            stt.StartLogging();
-            loggingResumed = true;
+
+            if (timer == 0) Debug.Log("timer started");
+
+            //Debug.Log("four");
+            timer += Time.deltaTime;
+
+            if (timer >= timerMax)
+            {
+                Debug.Log("timerMax reached !");
+
+                stt.StartLogging();
+                loggingResumed = true;
+
+                timer = 0;
+
+            }
+
         }
 
     }

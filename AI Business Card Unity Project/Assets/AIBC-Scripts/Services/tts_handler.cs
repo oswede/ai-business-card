@@ -11,8 +11,8 @@ public class tts_handler : MonoBehaviour {
 
     private TextToSpeech _textToSpeech;
 
-    private string tts_username = "7c903886-153a-44b0-ad64-26081c1a5910";
-    private string tts_password = "65IXm0UXkZr8";
+    private string tts_username = "7336c46b-9caf-4e76-b8bd-8180637e835a";
+    private string tts_password = "NcwtmXXPgJ3h";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
     private bool ttsResponseReceived;
@@ -29,7 +29,7 @@ public class tts_handler : MonoBehaviour {
         Credentials credentials = new Credentials(tts_username, tts_password, tts_url);
         _textToSpeech = new TextToSpeech(credentials);
 
-        _textToSpeech.Voice = VoiceType.en_GB_Kate;
+        _textToSpeech.Voice = VoiceType.en_US_Michael;
 
         //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed - currently not working
 
