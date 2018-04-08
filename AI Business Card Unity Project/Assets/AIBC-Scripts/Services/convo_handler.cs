@@ -14,7 +14,7 @@ public class convo_handler : MonoBehaviour {
     private string convo_username = "9b4aecd0-47ca-4b13-a055-342e21219a3b";
     private string convo_password = "p5nRkHgDlm5S";
     private string convo_url = "https://gateway.watsonplatform.net/conversation/api";
-    private string convo_workspaceId = "9ce0eddf-5995-4f96-866d-0c876fc991fe";
+    private string convo_workspaceId = "591b3c20-f135-4e3f-85be-91d3452d6b31";
     private string _conversationVersionDate = "2018-03-04";
 
     private fsSerializer _serializer = new fsSerializer();
@@ -118,6 +118,11 @@ public class convo_handler : MonoBehaviour {
     public void waitForNextConvoResponse()
     {
         convoResponseReceived = false;
+    }
+
+    public void Toggle_Changed(bool newValue)
+    {
+        convo_output_display.enabled = newValue;
     }
 
 }
