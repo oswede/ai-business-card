@@ -23,7 +23,7 @@ public class convo_handler : MonoBehaviour {
     private string convo_output; // output of the conversation to
     public Text convo_output_display; // display conversation output
 
-    private bool convoResponseReceived;
+    private ConvoResponse callback;
 
     void Start () {
 
@@ -32,8 +32,6 @@ public class convo_handler : MonoBehaviour {
         Credentials convo_credentials = new Credentials(convo_username, convo_password, convo_url);
         _conversation = new Conversation(convo_credentials);
         _conversation.VersionDate = _conversationVersionDate;
-
-        convoResponseReceived = false;
 
         Message(null); // send initial null message to the conversation to get the first response
     }
@@ -55,7 +53,6 @@ public class convo_handler : MonoBehaviour {
         }
     }
 
-
     private void OnMessageSuccess(object resp, Dictionary<string, object> customData)
     {
 
@@ -66,7 +63,6 @@ public class convo_handler : MonoBehaviour {
             _context = _tempContext as Dictionary<string, object>;
         else
             Log.Debug("ExampleConversation.OnMessageSuccess()", "Failed to get context");
-
 
         Log.Debug("CONVO.OnMessage()", "Conversation: Message Response: {0}", customData["json"].ToString());
 
@@ -96,7 +92,7 @@ public class convo_handler : MonoBehaviour {
             convo_output_display.text = convo_output;
         }
 
-        convoResponseReceived = true;
+        callback.convoResponseReceived(convo_output);
 
     }
 
@@ -105,24 +101,19 @@ public class convo_handler : MonoBehaviour {
         Log.Error("CONVO.HandleFail()", "Error received: {0}", error.ToString());
     }
 
-    public string getLastConvoOutput()
-    {
-        return convo_output;
-    }
-
-    public bool hasNextConvoResponse()
-    {
-        return convoResponseReceived;
-    }
-
-    public void waitForNextConvoResponse()
-    {
-        convoResponseReceived = false;
-    }
-
     public void Toggle_Changed(bool newValue)
     {
         convo_output_display.enabled = newValue;
+    }
+
+    public void setCallback(ServiceManager newCallback)
+    {
+        callback = newCallback;
+    }
+
+    public interface ConvoResponse
+    {
+        void convoResponseReceived(string lastResponse); // show output and move on to next stage
     }
 
 }

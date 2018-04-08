@@ -28,6 +28,8 @@ public class stt_handler : MonoBehaviour {
 
     private bool loggingResponse;
 
+    private STTResponse callback;
+
     void Start () {
 
         LogSystem.InstallDefaultReactors();
@@ -36,7 +38,6 @@ public class stt_handler : MonoBehaviour {
         _speechToText = new SpeechToText(stt_credentials);
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
-        sttResponseReceived = false;
         loggingResponse = false;
 
         StartRecording();
@@ -161,7 +162,6 @@ public class stt_handler : MonoBehaviour {
         if (loggingResponse)
         {
 
-
             if (result != null && result.results.Length > 0)
             {
                 foreach (var res in result.results)
@@ -175,8 +175,7 @@ public class stt_handler : MonoBehaviour {
                         
                         if (res.final)
                         {
-                            sttResponseReceived = true;
-                            StopLogging(); // final response received, so stop logging
+                            callback.sttResponseReceived(stt_output);
                         }
 
                     }
@@ -200,7 +199,6 @@ public class stt_handler : MonoBehaviour {
                     }
                 }
 
-
             }
         }
     }
@@ -216,24 +214,9 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    public bool hasNextSttResponse()
-    {
-        return sttResponseReceived;
-    }
-
-    public void waitForNextSttResponse()
-    {
-        sttResponseReceived = false;
-    }
-
     public bool isRecording()
     {
         return (_recordingRoutine != 0); // if recording routine != 0, then it is recording (mic is active) - STT is still connected even if recordingroutine == 0.
-    }
-
-    public string getSttOutput()
-    {
-        return stt_output;
     }
 
     public void StartLogging()
@@ -250,9 +233,14 @@ public class stt_handler : MonoBehaviour {
         loggingResponse = false;
     }
 
-    public bool isLogging()
+    public void setCallback(ServiceManager newCallback)
     {
-        return loggingResponse;
+        callback = newCallback;
+    }
+
+    public interface STTResponse
+    {
+        void sttResponseReceived(string lastResponse); // show output and move on to next stage
     }
 
 }

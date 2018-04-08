@@ -15,13 +15,11 @@ public class tts_handler : MonoBehaviour {
     private string tts_password = "LMDKiiChSd7x";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
-    private bool ttsResponseReceived;
-
     private AudioClip lastClip;
 
     private bool isPlaying;
 
-    //private string tts_output;
+    private TTSResponse callback;
 
     void Start () {
         LogSystem.InstallDefaultReactors();
@@ -33,7 +31,6 @@ public class tts_handler : MonoBehaviour {
 
         //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed - currently not working
 
-        ttsResponseReceived = false;
         isPlaying = false;
     }
 
@@ -46,7 +43,7 @@ public class tts_handler : MonoBehaviour {
     private void OnSynthesize(AudioClip clip, Dictionary<string, object> customData)
     {
         lastClip = clip;
-        ttsResponseReceived = true;
+        callback.ttsResponseReceived(lastClip);
         //PlayClip(clip); //now handled by ServiceManager
     }
 
@@ -60,33 +57,14 @@ public class tts_handler : MonoBehaviour {
         return lastClip;
     }
 
-    public bool hasNextTtsResponse()
+    public void setCallback(ServiceManager newCallback)
     {
-        return ttsResponseReceived;
+        callback = newCallback;
     }
 
-    public void waitForNextTtsResponse()
+    public interface TTSResponse
     {
-        ttsResponseReceived = false;
+        void ttsResponseReceived(AudioClip lastResponse); // show output and move on to next stage
     }
-
-    /* Moved to ServiceManager */
-    /*
-    private void PlayClip(AudioClip clip)
-    {
-        if (Application.isPlaying && clip != null)
-        {
-
-            GameObject audioObject = new GameObject("AudioObject");
-            AudioSource source = audioObject.AddComponent<AudioSource>();
-            source.spatialBlend = 0.0f;
-            source.loop = false;
-            source.clip = clip;
-            source.Play();
-
-            Destroy(audioObject, clip.length);
-        }
-    }
-    */
 
 }
