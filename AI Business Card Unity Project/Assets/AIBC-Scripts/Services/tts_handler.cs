@@ -11,14 +11,11 @@ public class tts_handler : MonoBehaviour {
 
     private TextToSpeech _textToSpeech;
 
-    private string tts_username = "05fb2b07-352a-42cd-8fa3-23869014194a";
-    private string tts_password = "LMDKiiChSd7x";
+    private string tts_username = "cc372924-80a7-42b1-9461-733a98ac7c6a";
+    private string tts_password = "73rsJlGpJiRP";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
-    private AudioClip lastClip;
-
     private bool isPlaying;
-
     private TTSResponse callback;
 
     void Start () {
@@ -28,8 +25,6 @@ public class tts_handler : MonoBehaviour {
         _textToSpeech = new TextToSpeech(credentials);
 
         _textToSpeech.Voice = VoiceType.en_US_Michael;
-
-        //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed - currently not working
 
         isPlaying = false;
     }
@@ -42,19 +37,12 @@ public class tts_handler : MonoBehaviour {
 
     private void OnSynthesize(AudioClip clip, Dictionary<string, object> customData)
     {
-        lastClip = clip;
-        callback.ttsResponseReceived(lastClip);
-        //PlayClip(clip); //now handled by ServiceManager
+        callback.ttsResponseReceived(clip);
     }
 
     private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
     {
         Log.Error("TTS.OnFail()", "Error received: {0}", error.ToString());
-    }
-
-    public AudioClip getLastTtsResponse()
-    {
-        return lastClip;
     }
 
     public void setCallback(ServiceManager newCallback)

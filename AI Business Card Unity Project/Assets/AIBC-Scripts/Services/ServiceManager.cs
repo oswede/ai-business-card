@@ -3,28 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+    /**
+     * This script controls the interaction between the different services, by sending the requests and managing the sequence of events in accordance with the application's functionality.
+     * Each service has its own handler script, with each connection being established as soon as the application is opened. In this way, each service_handler does not interact 
+     * directly with other services, allowing for later reusability if the requirements change.
+     * 
+     * Instead of calling GameObject.GetComponent on each of the member variables, they are all referenced from within the Unity interface (this slightly improves its performance), 
+     * and need to be declared public for this.
+     */
+
 public class ServiceManager : MonoBehaviour, 
     convo_handler.ConvoResponse, stt_handler.STTResponse, tts_handler.TTSResponse
 {
 
-    // Each service has its own handler script. This script provide the functionality for interacting between the different service handlers
-    // It prevents other game components from having to interact with the individual service handlers directly.
-
-    public stt_handler stt; // component referenced in scene
-    public convo_handler convo; // component referenced in scene
-    public tts_handler tts; // component referenced in scene
+    public stt_handler stt;
+    public convo_handler convo;
+    public tts_handler tts;
 
     public AudioSource ttsAudioSource;
 
-    private bool loggingResumed;
-
     public Text speakIndicator;
-
-    double timer = 0.0; // begins at this value
-    double timerMax = 3.0; // event occurs at this value
-
-    //public AudioClip lastClip;
-    //public Text convo_output_display;
 
    void Start () {
         speakIndicator.text = "Stop Talking";
@@ -35,29 +33,26 @@ public class ServiceManager : MonoBehaviour,
         tts.setCallback(this); // set tts's callback
     }
 
-    public void sttResponseReceived(string lastResponse)
+    public void sttResponseReceived(string lastSttResponse)
     {
         stt.StopLogging();  // stop stt from logging
 
         speakIndicator.text = "Stop Talking";
         speakIndicator.color = new Color32(189, 0, 0, 0xFF);
 
-        string stt_output = lastResponse; // fetch last message
+        string stt_output = lastSttResponse; // fetch last message
         convo.Message(stt_output);
     }
 
-    public void convoResponseReceived(string lastResponse)
+    public void convoResponseReceived(string lastConvoResponse)
     {
-        tts.Synthesize(lastResponse);
+        tts.Synthesize(lastConvoResponse);
     }
 
-    public void ttsResponseReceived(AudioClip lastResponse)
+    public void ttsResponseReceived(AudioClip lastTtsResponse)
     {
-        PlayClip(tts.getLastTtsResponse());
-        
-        StartCoroutine(WaitThenPause(lastResponse, 3));
-        
-        
+        PlayClip(lastTtsResponse);
+        StartCoroutine(WaitThenPause(lastTtsResponse, 3));
     }
 
     private void PlayClip(AudioClip clip)
@@ -67,17 +62,14 @@ public class ServiceManager : MonoBehaviour,
             ttsAudioSource.clip = clip;
             ttsAudioSource.Play();
         }
-
     }
-    
+
     IEnumerator WaitThenPause(AudioClip clip, float pause)
     {
         yield return new WaitForSecondsRealtime(clip.length + pause);   //Wait
-
         stt.StartLogging();
         speakIndicator.text = "Start Talking";
         speakIndicator.color = new Color32(0, 104, 0, 0xFF);
-
     }
 
 }

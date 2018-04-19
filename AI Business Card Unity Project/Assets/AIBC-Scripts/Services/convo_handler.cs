@@ -33,7 +33,9 @@ public class convo_handler : MonoBehaviour {
         _conversation = new Conversation(convo_credentials);
         _conversation.VersionDate = _conversationVersionDate;
 
-        Message(null); // send initial null message to the conversation to get the first response
+        convo_output = null;
+
+        Message(null); // initiate conversation connection & get the first response
     }
 
     public void Message(string nextMessage)
@@ -60,9 +62,13 @@ public class convo_handler : MonoBehaviour {
         (resp as Dictionary<string, object>).TryGetValue("context", out _tempContext);
 
         if (_tempContext != null)
+        {
             _context = _tempContext as Dictionary<string, object>;
+        }
         else
+        {
             Log.Debug("ExampleConversation.OnMessageSuccess()", "Failed to get context");
+        }
 
         Log.Debug("CONVO.OnMessage()", "Conversation: Message Response: {0}", customData["json"].ToString());
 
@@ -101,7 +107,7 @@ public class convo_handler : MonoBehaviour {
         Log.Error("CONVO.HandleFail()", "Error received: {0}", error.ToString());
     }
 
-    public void Toggle_Changed(bool newValue)
+    public void setConvoSubtitlesEnabled(bool newValue)
     {
         convo_output_display.enabled = newValue;
     }
@@ -111,7 +117,7 @@ public class convo_handler : MonoBehaviour {
         callback = newCallback;
     }
 
-    public interface ConvoResponse
+    public interface ConvoResponse // interface for the callback methods to be implemented within ServiceManager (and the passed object casted to restrict scope of operations to only the necessary ones)
     {
         void convoResponseReceived(string lastResponse); // show output and move on to next stage
     }

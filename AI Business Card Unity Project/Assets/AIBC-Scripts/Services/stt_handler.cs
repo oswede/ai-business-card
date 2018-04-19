@@ -22,7 +22,6 @@ public class stt_handler : MonoBehaviour {
     private int _recordingHZ = 22050;
 
     private string stt_output;
-    public Text stt_output_display; // display the speach to text as the responses are being received
 
     private bool sttResponseReceived;
 
@@ -171,7 +170,6 @@ public class stt_handler : MonoBehaviour {
                         //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
                         stt_output = string.Format("{0}", alt.transcript);
                         Log.Debug("STT.OnRecognize()", stt_output);
-                        stt_output_display.text = stt_output; // display the last received result
                         
                         if (res.final)
                         {
@@ -223,13 +221,12 @@ public class stt_handler : MonoBehaviour {
     {
         // keep updating the stored last result
         stt_output = ""; // reset from the previous output
-        stt_output_display.text = stt_output;
         loggingResponse = true;
     }
 
     public void StopLogging()
     {
-        // stop logigng the last stored result
+        // stop logging the last stored result
         loggingResponse = false;
     }
 
