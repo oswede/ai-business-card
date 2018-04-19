@@ -21,7 +21,6 @@ public class convo_handler : MonoBehaviour {
     private Dictionary<string, object> _context = null;
 
     private string convo_output; // output of the conversation to
-    public Text convo_output_display; // display conversation output
 
     private ConvoResponse callback;
 
@@ -95,7 +94,6 @@ public class convo_handler : MonoBehaviour {
                 convo_output += messageResponse.output.text[i] + "\n";
             }
 
-            convo_output_display.text = convo_output;
         }
 
         callback.convoResponseReceived(convo_output);
@@ -105,11 +103,6 @@ public class convo_handler : MonoBehaviour {
     private void OnMessageFail(RESTConnector.Error error, Dictionary<string, object> customData)
     {
         Log.Error("CONVO.HandleFail()", "Error received: {0}", error.ToString());
-    }
-
-    public void setConvoSubtitlesEnabled(bool newValue)
-    {
-        convo_output_display.enabled = newValue;
     }
 
     public void setCallback(ServiceManager newCallback)

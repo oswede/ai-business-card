@@ -23,8 +23,9 @@ public class ServiceManager : MonoBehaviour,
     public AudioSource ttsAudioSource;
 
     public Text speakIndicator;
+    public Text convo_output_display;
 
-   void Start () {
+    void Start () {
         speakIndicator.text = "Stop Talking";
         speakIndicator.color = new Color32(189, 0, 0, 0xFF);
 
@@ -46,7 +47,13 @@ public class ServiceManager : MonoBehaviour,
 
     public void convoResponseReceived(string lastConvoResponse)
     {
+        convo_output_display.text = lastConvoResponse;
         tts.Synthesize(lastConvoResponse);
+    }
+
+    public void setConvoSubtitlesEnabled(bool newValue)
+    {
+        convo_output_display.enabled = newValue;
     }
 
     public void ttsResponseReceived(AudioClip lastTtsResponse)
@@ -54,7 +61,7 @@ public class ServiceManager : MonoBehaviour,
         PlayClip(lastTtsResponse);
         StartCoroutine(WaitThenPause(lastTtsResponse, 3));
     }
-
+    
     private void PlayClip(AudioClip clip)
     {
         if (Application.isPlaying && clip != null)
@@ -71,5 +78,5 @@ public class ServiceManager : MonoBehaviour,
         speakIndicator.text = "Start Talking";
         speakIndicator.color = new Color32(0, 104, 0, 0xFF);
     }
-
+    
 }

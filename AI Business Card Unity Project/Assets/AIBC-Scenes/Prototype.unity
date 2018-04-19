@@ -175,29 +175,6 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &147234532
-Material:
-  serializedVersion: 6
-  m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
-  m_Name: MMD4Mecanim/MMDLit-NEXTEdge-Pass4
-  m_Shader: {fileID: 4800000, guid: 684f8af9b4ff4bc459588db5b0f6275d, type: 3}
-  m_ShaderKeywords: 
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: 2001
-  stringTagMap: {}
-  disabledShaderPasses: []
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs: []
-    m_Floats:
-    - _EdgeSize: 0.005
-    - _PostfixRenderQueue: 1
-    m_Colors:
-    - _EdgeColor: {r: 0.4, g: 1, b: 1, a: 1}
 --- !u!1 &215434604
 GameObject:
   m_ObjectHideFlags: 0
@@ -276,7 +253,7 @@ MonoBehaviour:
   onValueChanged:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2005619078}
+      - m_Target: {fileID: 1020255948}
         m_MethodName: setConvoSubtitlesEnabled
         m_Mode: 0
         m_Arguments:
@@ -290,14 +267,14 @@ MonoBehaviour:
     m_TypeName: UnityEngine.UI.Toggle+ToggleEvent, UnityEngine.UI, Version=1.0.0.0,
       Culture=neutral, PublicKeyToken=null
   m_IsOn: 1
---- !u!21 &523280467
+--- !u!21 &447759840
 Material:
   serializedVersion: 6
   m_ObjectHideFlags: 0
   m_PrefabParentObject: {fileID: 0}
   m_PrefabInternal: {fileID: 0}
-  m_Name: MMD4Mecanim/MMDLit-NEXTEdge-Pass8
-  m_Shader: {fileID: 4800000, guid: ff1e1d0bbf6980244a107d25ff535f9a, type: 3}
+  m_Name: MMD4Mecanim/MMDLit-NEXTEdge-Pass4
+  m_Shader: {fileID: 4800000, guid: 684f8af9b4ff4bc459588db5b0f6275d, type: 3}
   m_ShaderKeywords: 
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
@@ -1268,8 +1245,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2dbcb8f64d6a7a640a973b2df934eb10, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  nextEdgeMaterial_Pass4: {fileID: 147234532}
-  nextEdgeMaterial_Pass8: {fileID: 523280467}
+  nextEdgeMaterial_Pass4: {fileID: 447759840}
+  nextEdgeMaterial_Pass8: {fileID: 861969881}
   nextEdgePass: 0
   nextEdgeSize: 1
   nextEdgeColor: {r: 0.4, g: 1, b: 1, a: 1}
@@ -5071,6 +5048,29 @@ MonoBehaviour:
   boneID: 186
   ikEnabled: 0
   ikWeight: 1
+--- !u!21 &861969881
+Material:
+  serializedVersion: 6
+  m_ObjectHideFlags: 0
+  m_PrefabParentObject: {fileID: 0}
+  m_PrefabInternal: {fileID: 0}
+  m_Name: MMD4Mecanim/MMDLit-NEXTEdge-Pass8
+  m_Shader: {fileID: 4800000, guid: ff1e1d0bbf6980244a107d25ff535f9a, type: 3}
+  m_ShaderKeywords: 
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: 2001
+  stringTagMap: {}
+  disabledShaderPasses: []
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs: []
+    m_Floats:
+    - _EdgeSize: 0.005
+    - _PostfixRenderQueue: 1
+    m_Colors:
+    - _EdgeColor: {r: 0.4, g: 1, b: 1, a: 1}
 --- !u!1 &912589578
 GameObject:
   m_ObjectHideFlags: 0
@@ -5332,6 +5332,7 @@ MonoBehaviour:
   tts: {fileID: 1726893476}
   ttsAudioSource: {fileID: 1191453837}
   speakIndicator: {fileID: 754324758}
+  convo_output_display: {fileID: 1333729869}
 --- !u!4 &1020255949
 Transform:
   m_ObjectHideFlags: 0
@@ -5449,7 +5450,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 226c365dc046637408ee6d5e36634a7e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  stt_output_display: {fileID: 0}
 --- !u!4 &1106317275
 Transform:
   m_ObjectHideFlags: 0
@@ -5868,7 +5868,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: 
 --- !u!222 &1333729870
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -6128,7 +6128,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8cc8bf9878840b34ab051496cb132522, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  convo_output_display: {fileID: 1333729869}
 --- !u!4 &2005619079
 Transform:
   m_ObjectHideFlags: 0
