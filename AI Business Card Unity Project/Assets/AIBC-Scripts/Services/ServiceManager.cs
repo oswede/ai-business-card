@@ -51,15 +51,20 @@ public class ServiceManager : MonoBehaviour,
         tts.Synthesize(lastConvoResponse);
     }
 
-    public void setConvoSubtitlesEnabled(bool newValue)
+    public void setConvoSubtitlesEnabled(bool subtitlesEnabled)
     {
-        convo_output_display.enabled = newValue;
+        convo_output_display.enabled = subtitlesEnabled;
     }
 
     public void ttsResponseReceived(AudioClip lastTtsResponse)
     {
         PlayClip(lastTtsResponse);
-        StartCoroutine(WaitThenPause(lastTtsResponse, 3));
+        StartCoroutine(WaitForClip(lastTtsResponse, 3));
+    }
+
+    public void setAudioEnabled(bool audioEnabled)
+    {
+        ttsAudioSource.mute = !audioEnabled;
     }
     
     private void PlayClip(AudioClip clip)
@@ -71,7 +76,7 @@ public class ServiceManager : MonoBehaviour,
         }
     }
 
-    IEnumerator WaitThenPause(AudioClip clip, float pause)
+    IEnumerator WaitForClip(AudioClip clip, float pause)
     {
         yield return new WaitForSecondsRealtime(clip.length + pause);   //Wait
         stt.StartLogging();
