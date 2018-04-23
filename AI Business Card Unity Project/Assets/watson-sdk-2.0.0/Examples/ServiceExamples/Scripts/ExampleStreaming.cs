@@ -29,8 +29,7 @@ public class ExampleStreaming : MonoBehaviour
     private string _username = null;
     private string _password = null;
     private string _url = null;
-
-
+    
     public Text ResultsField;
 
     private int _recordingRoutine = 0;

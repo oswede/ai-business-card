@@ -11,36 +11,33 @@ public class tts_handler : MonoBehaviour {
 
     private TextToSpeech _textToSpeech;
 
-    private string tts_username = "23225016-db41-4a1a-bccc-af5a34d26e86";
-    private string tts_password = "kURHMaq8hmyr";
+    private string tts_username = "cc372924-80a7-42b1-9461-733a98ac7c6a";
+    private string tts_password = "73rsJlGpJiRP";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
-    private bool _synthesizeTested = false;
-
-    //private string tts_output;
+    private bool isPlaying;
+    private TTSResponse callback;
 
     void Start () {
-
         LogSystem.InstallDefaultReactors();
 
         Credentials credentials = new Credentials(tts_username, tts_password, tts_url);
         _textToSpeech = new TextToSpeech(credentials);
 
-        _textToSpeech.Voice = VoiceType.en_GB_Kate;
-        //_textToSpeech.AudioFormat = AudioFormatType.FLAC; // lossless but compressed
+        _textToSpeech.Voice = VoiceType.en_US_Michael;
+
+        isPlaying = false;
     }
 
     public void Synthesize(string input)
     {
-        TextToSpeech t = new TextToSpeech(new Credentials(tts_username, tts_password, tts_url));
-
         if (!_textToSpeech.ToSpeech(OnSynthesize, OnFail, input))
             Log.Debug("TTS.ToSpeech()", "Failed to synthesize!");
     }
 
     private void OnSynthesize(AudioClip clip, Dictionary<string, object> customData)
     {
-        PlayClip(clip);
+        callback.ttsResponseReceived(clip);
     }
 
     private void OnFail(RESTConnector.Error error, Dictionary<string, object> customData)
@@ -48,19 +45,14 @@ public class tts_handler : MonoBehaviour {
         Log.Error("TTS.OnFail()", "Error received: {0}", error.ToString());
     }
 
-    private void PlayClip(AudioClip clip)
+    public void setCallback(ServiceManager newCallback)
     {
-        if (Application.isPlaying && clip != null)
-        {
-            GameObject audioObject = new GameObject("AudioObject");
-            AudioSource source = audioObject.AddComponent<AudioSource>();
-            source.spatialBlend = 0.0f;
-            source.loop = false;
-            source.clip = clip;
-            source.Play();
+        callback = newCallback;
+    }
 
-            Destroy(audioObject, clip.length);
-        }
+    public interface TTSResponse
+    {
+        void ttsResponseReceived(AudioClip lastResponse); // show output and move on to next stage
     }
 
 }

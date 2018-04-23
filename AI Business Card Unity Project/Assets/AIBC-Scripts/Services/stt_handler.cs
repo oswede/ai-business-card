@@ -11,8 +11,8 @@ public class stt_handler : MonoBehaviour {
 
     private SpeechToText _speechToText;
 
-    private string stt_username = "8f137eeb-cb17-47d4-afea-36b21f6982f0";
-    private string stt_password = "tMawRjCtV56K";
+    private string stt_username = "d3fd4338-e6cd-45d0-b5ee-b68cf4c7d7cd";
+    private string stt_password = "WPXWmQPKN1Mi";
     private string stt_url = "https://stream.watsonplatform.net/speech-to-text/api";
 
     private int _recordingRoutine = 0;
@@ -22,9 +22,12 @@ public class stt_handler : MonoBehaviour {
     private int _recordingHZ = 22050;
 
     private string stt_output;
-    public Text stt_output_display; // display the speach to text as the responses are being received
 
     private bool sttResponseReceived;
+
+    private bool loggingResponse;
+
+    private STTResponse callback;
 
     void Start () {
 
@@ -34,7 +37,9 @@ public class stt_handler : MonoBehaviour {
         _speechToText = new SpeechToText(stt_credentials);
 
         STT_Active = true; // keep the connection active throughout to reduce overhead
-        sttResponseReceived = false;
+        loggingResponse = false;
+
+        StartRecording();
     }
 
     public bool STT_Active
@@ -56,6 +61,7 @@ public class stt_handler : MonoBehaviour {
                 _speechToText.SmartFormatting = true;
                 _speechToText.SpeakerLabels = false;
                 _speechToText.WordAlternativesThreshold = null;
+                
                 _speechToText.StartListening(OnRecognize, OnRecognizeSpeaker);
             }
             else if (!value && _speechToText.IsListening) // if listening and set to false, stop listening
@@ -152,41 +158,45 @@ public class stt_handler : MonoBehaviour {
 
     private void OnRecognize(SpeechRecognitionEvent result)
     {
-        if (result != null && result.results.Length > 0)
+        if (loggingResponse)
         {
-            foreach (var res in result.results)
+
+            if (result != null && result.results.Length > 0)
             {
-                foreach (var alt in res.alternatives)
+                foreach (var res in result.results)
                 {
-                    //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
-                    stt_output = string.Format("{0}", alt.transcript);
-                    Log.Debug("STT.OnRecognize()", stt_output);
-                    stt_output_display.text = stt_output; // display the last received result
-
-                    if (res.final)
+                    foreach (var alt in res.alternatives)
                     {
-                        sttResponseReceived = true;
+                        //string text = string.Format("{0} ({1}, {2:0.00})\n", alt.transcript, res.final ? "Final" : "Interim", alt.confidence);
+                        stt_output = string.Format("{0}", alt.transcript);
+                        Log.Debug("STT.OnRecognize()", stt_output);
+                        
+                        if (res.final)
+                        {
+                            callback.sttResponseReceived(stt_output);
+                        }
+
                     }
 
-                }
-
-                if (res.keywords_result != null && res.keywords_result.keyword != null)
-                {
-                    foreach (var keyword in res.keywords_result.keyword)
+                    if (res.keywords_result != null && res.keywords_result.keyword != null)
                     {
-                        Log.Debug("STT.OnRecognize()", "keyword: {0}, confidence: {1}, start time: {2}, end time: {3}", keyword.normalized_text, keyword.confidence, keyword.start_time, keyword.end_time);
+                        foreach (var keyword in res.keywords_result.keyword)
+                        {
+                            Log.Debug("STT.OnRecognize()", "keyword: {0}, confidence: {1}, start time: {2}, end time: {3}", keyword.normalized_text, keyword.confidence, keyword.start_time, keyword.end_time);
+                        }
+                    }
+
+                    if (res.word_alternatives != null)
+                    {
+                        foreach (var wordAlternative in res.word_alternatives)
+                        {
+                            Log.Debug("STT.OnRecognize()", "Word alternatives found. Start time: {0} | EndTime: {1}", wordAlternative.start_time, wordAlternative.end_time);
+                            foreach (var alternative in wordAlternative.alternatives)
+                                Log.Debug("STT.OnRecognize()", "\t word: {0} | confidence: {1}", alternative.word, alternative.confidence);
+                        }
                     }
                 }
 
-                if (res.word_alternatives != null)
-                {
-                    foreach (var wordAlternative in res.word_alternatives)
-                    {
-                        Log.Debug("STT.OnRecognize()", "Word alternatives found. Start time: {0} | EndTime: {1}", wordAlternative.start_time, wordAlternative.end_time);
-                        foreach (var alternative in wordAlternative.alternatives)
-                            Log.Debug("STT.OnRecognize()", "\t word: {0} | confidence: {1}", alternative.word, alternative.confidence);
-                    }
-                }
             }
         }
     }
@@ -202,24 +212,32 @@ public class stt_handler : MonoBehaviour {
         }
     }
 
-    public bool hasNextSttResponse()
-    {
-        return sttResponseReceived;
-    }
-
-    public void waitForNextSttResponse()
-    {
-        sttResponseReceived = false;
-    }
-
     public bool isRecording()
     {
         return (_recordingRoutine != 0); // if recording routine != 0, then it is recording (mic is active) - STT is still connected even if recordingroutine == 0.
     }
 
-    public string getSttOutput()
+    public void StartLogging()
     {
-        return stt_output;
+        // keep updating the stored last result
+        stt_output = ""; // reset from the previous output
+        loggingResponse = true;
+    }
+
+    public void StopLogging()
+    {
+        // stop logging the last stored result
+        loggingResponse = false;
+    }
+
+    public void setCallback(ServiceManager newCallback)
+    {
+        callback = newCallback;
+    }
+
+    public interface STTResponse
+    {
+        void sttResponseReceived(string lastResponse); // show output and move on to next stage
     }
 
 }

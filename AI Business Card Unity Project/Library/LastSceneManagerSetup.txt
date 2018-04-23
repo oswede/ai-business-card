@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/AIBC-Scenes/test/recording.unity
+- path: Assets/AIBC-Scenes/Prototype.unity
   isLoaded: 1
   isActive: 1
