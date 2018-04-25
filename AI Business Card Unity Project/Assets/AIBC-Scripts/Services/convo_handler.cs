@@ -11,10 +11,10 @@ using FullSerializer;
 public class convo_handler : MonoBehaviour {
 
     private Conversation _conversation;
-    private string convo_username = "9b4aecd0-47ca-4b13-a055-342e21219a3b";
-    private string convo_password = "p5nRkHgDlm5S";
+    private string convo_username = "386cd1ab-1573-4b52-96a6-a28805df1a7f";
+    private string convo_password = "L6Shz7jcxeue";
     private string convo_url = "https://gateway.watsonplatform.net/conversation/api";
-    private string convo_workspaceId = "591b3c20-f135-4e3f-85be-91d3452d6b31";
+    private string convo_workspaceId = "84f98e68-d53b-40c8-8af7-4a210c854b05";
     private string _conversationVersionDate = "2018-03-04";
 
     private fsSerializer _serializer = new fsSerializer();

@@ -11,8 +11,8 @@ public class stt_handler : MonoBehaviour {
 
     private SpeechToText _speechToText;
 
-    private string stt_username = "d3fd4338-e6cd-45d0-b5ee-b68cf4c7d7cd";
-    private string stt_password = "WPXWmQPKN1Mi";
+    private string stt_username = "95380fb7-70f2-4259-a25e-dcf94ce2d8a6";
+    private string stt_password = "QOOcXLiTW8L6";
     private string stt_url = "https://stream.watsonplatform.net/speech-to-text/api";
 
     private int _recordingRoutine = 0;
