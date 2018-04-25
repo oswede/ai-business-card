@@ -1,12 +1,7 @@
 # AI Business Card
 
 ## Messages for Team
-
-Please make all commits to the dev branch and then make a merge request
-
-Everyone needs to have made a contribution by the 15th of December
-
-Please make sure you are in the slack and receiving notifications
+CURRENT VERSION OF CODE ON BRANCH: Prototype4
 
 ## Project Description
 Our Project is to design and build an intelligent AR Business Card. We will be using Watson Conversations to build a chatbot that guides the user through a conversation about John McNamara, a Senior Inventor and Innovation Centre Technologist Lead at IBM.
@@ -16,7 +11,7 @@ The app will allow the user to point their camara at the physical business card.
 ## Our Team
 
 ### @Janshai Jack Adams (Team Leader)
-Jack is the team leader and is currently responsible for general Unity development as well as assisting Oliver with Watson connection and Pantelis with AR/Vuforia integration.
+Jack is the team leader and is currently responsible for general Unity development as well as assisting Oliver with Watson connection and Pantelis with AR/Vuforia integration. Working on website with Pantelis
 
 Contact: psyja3@nottingham.ac.uk
 
@@ -41,7 +36,7 @@ Lu is currently responsible for the 3D modelling of the avatar along with Pan
 Contact: psyjl10@nottingham.ac.uk
 
 ### @GregoPantelis Pantelis Gregoriades
-Pantelis is currently responsible for researching Vuforia, an AR sdk for Unity
+Pantelis is currently responsible for researching Vuforia, an AR sdk for Unity. Also working on website with Jack.
 
 Contact: psypg1@nottingham.ac.uk
 
@@ -64,3 +59,4 @@ Contact: jon_mcnam@uk.ibm.com
 ### Trello - https://trello.com/invite/b/hoxwI9Ve/ec3d7a359b8bde9963ddb82d009cda82/ibm-ai-business-card
 ### Google Drive - https://drive.google.com/drive/folders/0B_TPLO-MurBoazczV1dQZzRROWs?usp=sharing
 ### Slack - https://ibmaibusinesscard.slack.com/
+### Website Repo - https://github.com/GregoPantelis/GregoPantelis.github.io
