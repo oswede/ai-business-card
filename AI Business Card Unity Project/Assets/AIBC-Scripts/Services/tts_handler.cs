@@ -11,8 +11,8 @@ public class tts_handler : MonoBehaviour {
 
     private TextToSpeech _textToSpeech;
 
-    private string tts_username = "0cc6edec-c294-4db1-8cd6-6d2ffd6cc903";
-    private string tts_password = "pwfaTpXyZxUM";
+    private string tts_username = "c4f30374-c99d-4c2a-ae77-d5a7d41c4ed4";
+    private string tts_password = "DXmGx3HNz1M2";
     private string tts_url = "https://stream.watsonplatform.net/text-to-speech/api";
 
     private bool isPlaying;
