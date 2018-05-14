@@ -40,7 +40,7 @@ public class Speak : MonoBehaviour
         //lipSync.volume = 0.0f;
         int rangeRadomNum = 0;
         
-        if (ttsSource.clip == audio_clip && lipSync.isTalking)
+        if (ttsSource.clip == audio_clip && ttsSource.isPlaying)
         {
             UnityEngine.Random a = new UnityEngine.Random();
             System.Random b = new System.Random();
