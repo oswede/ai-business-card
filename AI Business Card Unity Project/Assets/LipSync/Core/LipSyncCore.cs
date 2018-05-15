@@ -447,7 +447,7 @@ public abstract class LipSyncCore : MonoBehaviour
 
         // End
         position_ += data.Length / channels;
-        if (position_ >= 2*samples_)
+        if (position_ >= 1.1*samples_)
         {
             // fade out voice
             var m = data.Length / channels;

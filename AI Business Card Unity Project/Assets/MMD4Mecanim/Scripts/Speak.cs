@@ -8,6 +8,7 @@ public class Speak : MonoBehaviour
     public AudioSource ttsSource;
     private AudioClip audio_clip = null;
     public Toggle toggle;
+   // private AudioSource testAudio;
     // Use this for initialization
     void Start()
     {
@@ -23,13 +24,16 @@ public class Speak : MonoBehaviour
     void Update()
     {
         var audio_source = this.GetComponent<AudioSource>();
+        
         Debug.Log(toggle.isOn);
         if (toggle.isOn)
         {
+            ttsSource.mute = true;
             audio_source.mute = false;
         }
         else if (!toggle.isOn)
         {
+            ttsSource.mute = true;
             audio_source.mute = true;
         }
         MMD4MecanimSpeechHelper test = this.GetComponent<MMD4MecanimSpeechHelper>();
@@ -40,7 +44,7 @@ public class Speak : MonoBehaviour
         //lipSync.volume = 0.0f;
         int rangeRadomNum = 0;
         
-        if (ttsSource.clip == audio_clip && ttsSource.isPlaying)
+        if (ttsSource.clip == audio_clip && ttsSource.isPlaying&& ttsSource.clip!=null)
         {
             UnityEngine.Random a = new UnityEngine.Random();
             System.Random b = new System.Random();
@@ -63,10 +67,14 @@ public class Speak : MonoBehaviour
         }
         else if (ttsSource.clip != audio_clip)
         {
+            audio_clip = ttsSource.clip;
+            // ttsSource.Play();
+            ttsSource.mute = true;
             lipSync.Play(ttsSource.clip);
             lipSync.volume = 1.0f;
+            
         }
-        audio_clip = ttsSource.clip;
+        
     }
  
 }
