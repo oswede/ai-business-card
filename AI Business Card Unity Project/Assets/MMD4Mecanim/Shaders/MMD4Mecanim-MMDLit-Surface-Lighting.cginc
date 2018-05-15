@@ -1,104 +1,67 @@
-// Not for redistribution without the author's express written permission
-#ifndef MMDLIT_SURFACE_LIGHTING_INCLUDED
-#define MMDLIT_SURFACE_LIGHTING_INCLUDED
-//#include "MMD4Mecanim-MMDLit-Lighting.cginc"
 
-#include "MMD4Mecanim-MMDLit-Surface-Tessellation.cginc"
+#include "MMD4Mecanim-MMDLit-Lighting.cginc"
 
-#ifndef MMD4MECANIM_STANDARD
+#define SUPPORT_SELFSHADOWSTR
+#define SUPPORT_LAMBERTSTR
+#define SUPPORT_ADDLAMBERTSTR
+
 half4 _Color;
-#endif
 half4 _Specular;
 half4 _Ambient;
 half _Shininess;
 half _ShadowLum;
-half _AmbientToDiffuse;
-
-#ifndef MMD4MECANIM_STANDARD
+half _SelfShadowStr;
+half _LambertStr;
+half _AddLambertStr;
+half _SphereAddMul;
+half _SphereMulMul;
 sampler2D _MainTex;
-#endif
 sampler2D _ToonTex;
+sampler2D _SphereAddTex;
+sampler2D _SphereMulTex;
 
-half _AddLightToonCen;
-half _AddLightToonMin;
+#define mmd_centerAmbient (0.5)
+#define mmd_globalLighting (0.6)
 
-half4 _ToonTone;
-
-half4 _Emissive;
-
-samplerCUBE _SphereCube;
-
-#define MMDLIT_GLOBALLIGHTING		half3(0.6, 0.6, 0.6)
-#define MMDLIT_CENTERAMBIENT		half3(0.5, 0.5, 0.5)
-#define MMDLIT_CENTERAMBIENT_INV	half3(1.0 / 0.5, 1.0 / 0.5, 1.0 / 0.5)
-#define MMDLIT_DIFFUSECLIPPING		half3(0.5, 0.5, 0.5)
-
-// Ambient Feedback Rate from Unity.
 inline half3 MMDLit_GetTempAmbientL()
 {
-	return max(MMDLIT_CENTERAMBIENT - (half3)_Ambient, half3(0,0,0)) * MMDLIT_CENTERAMBIENT_INV;
+	return max((half3)mmd_centerAmbient - (half3)_Ambient, (half3)0) / (half3)mmd_centerAmbient;
 }
 
-inline half3 MMDLit_GetAmbientRate()
+inline half3 MMDLit_GetTempAmbient()
 {
-	return half3(1.0, 1.0, 1.0) - MMDLit_GetTempAmbientL();
+	half3 globalAmbient = (half3)UNITY_LIGHTMODEL_AMBIENT * 2.0;
+	return globalAmbient * (1.0 - MMDLit_GetTempAmbientL());
 }
 
-inline half3 MMDLit_GetTempAmbient( half3 globalAmbient )
+inline half3 MMDLit_GetTempDiffuse()
 {
-	return globalAmbient * MMDLit_GetAmbientRate();
+	half3 globalAmbient = (half3)UNITY_LIGHTMODEL_AMBIENT * 2.0;
+	half3 mmdLighting = min( (half3)_Ambient + (half3)_Color * mmd_globalLighting, 1.0 );
+	return max(mmdLighting - MMDLit_GetTempAmbient(), 0.0);
 }
 
-inline half3 MMDLit_GetTempDiffuse( half3 globalAmbient )
+inline half3 MMDLit_GetAlbedo(float2 uv_MainTex, half2 uv_Sphere)
 {
-	half3 tempColor = min((half3)_Ambient + (half3)_Color * MMDLIT_GLOBALLIGHTING, half3(1,1,1));
-	tempColor = max(tempColor - MMDLit_GetTempAmbient(globalAmbient), half3(0,0,0));
-	#ifdef AMB2DIFF_ON // Passed in Forward Add
-	tempColor *= min(globalAmbient * _AmbientToDiffuse, half3(1,1,1)); // Feedback ambient for Unity5.
-	#endif
-	return tempColor;
+	half3 c = (half3)tex2D(_MainTex, uv_MainTex);
+	c += (half3)tex2D(_SphereAddTex, uv_Sphere) * _SphereAddMul;
+	c *= (half3)tex2D(_SphereMulTex, uv_Sphere) * _SphereMulMul + (1.0 - _SphereMulMul);
+	return c;
 }
 
-inline half3 MMDLit_GetTempDiffuse_NoAmbient()
+inline half3 MMDLit_GetAlbedo(float2 uv_MainTex, half2 uv_Sphere, out half alpha)
 {
-	half3 tempColor = saturate((half3)_Ambient + (half3)_Color * MMDLIT_GLOBALLIGHTING - MMDLIT_DIFFUSECLIPPING);
-	return tempColor;
-}
-
-inline void MMDLit_GetBaseColor(
-	half3 albedo,
-	half3 tempDiffuse,
-	half3 uvw_Sphere,
-	out half3 baseC,
-	out half3 baseD)
-{
-	#ifdef SPHEREMAP_MUL
-	half3 sph = (half3)texCUBE(_SphereCube, uvw_Sphere);
-	baseC = albedo * sph;
-	baseD = baseC * tempDiffuse; // for Diffuse only.
-	#elif SPHEREMAP_ADD
-	half3 sph = (half3)texCUBE(_SphereCube, uvw_Sphere);
-	baseC = albedo + sph;
-	baseD = albedo * tempDiffuse + sph; // for Diffuse only.
-	#else
-	baseC = albedo;
-	baseD = albedo * tempDiffuse;
-	#endif
-}
-
-inline half4 MMDLit_GetAlbedo(float2 uv_MainTex)
-{
-	return (half4)tex2D(_MainTex, uv_MainTex);
+	half4 c = tex2D(_MainTex, uv_MainTex);
+	half3 r = (half3)c;
+	r += (half3)tex2D(_SphereAddTex, uv_Sphere) * _SphereAddMul;
+	r *= (half3)tex2D(_SphereMulTex, uv_Sphere) * _SphereMulMul + (1.0 - _SphereMulMul);
+	alpha = c.a * _Color.a;
+	return r;
 }
 
 inline half MMDLit_GetToolRefl(half NdotL)
 {
-	return NdotL * _ToonTone.y + _ToonTone.z; // Necesally saturate.
-}
-
-inline half MMDLit_GetShadowAttenToToon(half shadowAtten)
-{
-	return ((shadowAtten - 0.5) * _ToonTone.x) + _ToonTone.z; // Necesally saturate.
+	return NdotL * 0.5 + 0.5;
 }
 
 inline half MMDLit_GetToonShadow(half toonRefl)
@@ -107,112 +70,128 @@ inline half MMDLit_GetToonShadow(half toonRefl)
 	return (half)saturate(toonShadow * toonShadow - 1.0);
 }
 
-inline half MMDLit_GetForwardAddStr(half toonRefl)
+// for ForwardAdd
+inline half MMDLit_GetLambertAtten(half lambertStr)
 {
-	half toonShadow = (toonRefl - _AddLightToonCen) * 2.0;
-	return (half)clamp(toonShadow * toonShadow - 1.0, _AddLightToonMin, 1.0);
+	return lambertStr * _LambertStr + (1.0 - _LambertStr);
 }
 
 // for ForwardBase
-inline half3 MMDLit_GetRamp(half NdotL, half shadowAtten)
+inline half3 MMDLit_GetRamp(half NdotL, half lambertStr, half shadowAtten)
 {
-	half refl = saturate(min(MMDLit_GetToolRefl(NdotL), MMDLit_GetShadowAttenToToon(shadowAtten)));
-
+	half refl = (NdotL * 0.5 + 0.5) * shadowAtten;
 	half toonRefl = refl;
-
-	#ifdef SELFSHADOW_ON
-	refl = 0;
-	#endif
-	
+#ifdef SUPPORT_SELFSHADOWSTR
+	half selfShadowStrInv = 1.0 - _SelfShadowStr;
+	refl = refl * selfShadowStrInv; // _SelfShadowStr = 1.0 as 0
+#endif
 	half3 ramp = (half3)tex2D(_ToonTex, half2(refl, refl));
-
-	#ifdef SELFSHADOW_ON
+#ifdef SUPPORT_SELFSHADOWSTR
 	half toonShadow = MMDLit_GetToonShadow(toonRefl);
-	ramp = lerp(ramp, half3(1.0, 1.0, 1.0), toonShadow);
-	#endif
-
+	half3 rampSS = (1.0 - toonShadow) * ramp + toonShadow;
+	ramp = rampSS * _SelfShadowStr + ramp * selfShadowStrInv;
+#endif
 	ramp = saturate(1.0 - (1.0 - ramp) * _ShadowLum);
+#ifdef SUPPORT_LAMBERTSTR
+	ramp *= MMDLit_GetLambertAtten(lambertStr * shadowAtten);
+#endif
 	return ramp;
 }
 
 // for ForwardAdd
-inline half3 MMDLit_GetRamp_Add(half toonRefl, half toonShadow)
+inline half3 MMDLit_GetRamp_Add(half toonRefl, half toonShadow, half lambertStr, half lambertAtten)
 {
-	half refl = saturate(toonRefl);
-	
-	#ifdef SELFSHADOW_ON
-	refl = 0;
-	#endif
-	
+	half refl = toonRefl;
+#ifdef SUPPORT_SELFSHADOWSTR
+	half selfShadowStrInv = 1.0 - _SelfShadowStr;
+	refl = refl * selfShadowStrInv; // _SelfShadowStr = 1.0 as 0
+#endif
 	half3 ramp = (half3)tex2D(_ToonTex, half2(refl, refl));
-
-	#ifdef SELFSHADOW_ON
+#ifdef SUPPORT_SELFSHADOWSTR
 	half3 rampSS = (1.0 - toonShadow) * ramp + toonShadow;
-	ramp = rampSS;
-	#endif
-	
+	ramp = rampSS * _SelfShadowStr + ramp * selfShadowStrInv;
+#endif
 	ramp = saturate(1.0 - (1.0 - ramp) * _ShadowLum);
+#ifdef SUPPORT_LAMBERTSTR
+	ramp *= lambertAtten;
+#endif
+	return ramp;
+}
+
+// for Lightmap, DirLightmap
+inline half3 MMDLit_GetRamp_Lightmap()
+{
+	half3 ramp = tex2D(_ToonTex, float2(1.0, 1.0));
+	ramp = saturate(1.0 - (1.0 - ramp) * _ShadowLum);
+#ifdef SUPPORT_SELFSHADOWSTR
+	ramp = ramp * (1.0 - _SelfShadowStr) + _SelfShadowStr; // _SelfShadowStr = 1.0 as White
+#endif
+	// No shadowStr, because included lightColor.
+	return (half3)ramp;
+}
+
+// DirLightmap
+inline half3 MMDLit_GetRamp_DirLightmap(half NdotL, half lambertStr)
+{
+	half refl = (NdotL * 0.5 + 0.5);
+#ifdef SUPPORT_SELFSHADOWSTR
+	half selfShadowStrInv = 1.0 - _SelfShadowStr;
+	refl = refl * selfShadowStrInv; // _SelfShadowStr = 1.0 as 0
+#endif
+	half3 ramp = (half3)tex2D(_ToonTex, half2(refl, refl));
+#ifdef SUPPORT_SELFSHADOWSTR
+	half3 rampSS = (1.0 - lambertStr) * ramp + lambertStr; // memo: Not use toonShadow.
+	ramp = rampSS * _SelfShadowStr + ramp * selfShadowStrInv;
+#endif
+	ramp = saturate(1.0 - (1.0 - ramp) * _ShadowLum);
+	// No shadowStr, because included lightColor.
 	return ramp;
 }
 
 // for FORWARD_BASE
 inline half3 MMDLit_Lighting(
 	half3 albedo,
-	half3 uvw_Sphere,
+	half3 tempDiffuse,
 	half NdotL,
+	half lambertStr,
 	half3 normal,
 	half3 lightDir,
 	half3 viewDir,
 	half atten,
-	half shadowAtten,
-	out half3 baseC,
-	half3 globalAmbient)
+	half shadowAtten)
 {
-	half3 ramp = MMDLit_GetRamp(NdotL, shadowAtten);
-	half3 lightColor = (half3)_LightColor0 * MMDLIT_ATTEN(atten);
+	half3 ramp = MMDLit_GetRamp(NdotL, lambertStr, shadowAtten);
+	half3 lightColor = (half3)_LightColor0 * atten * 2.0;
 
-	half3 baseD;
-	MMDLit_GetBaseColor(albedo, MMDLit_GetTempDiffuse(globalAmbient), uvw_Sphere, baseC, baseD);
-	
-	half3 c = baseD * lightColor * ramp;
-	
-	#ifdef SPECULAR_ON
+	half3 c = tempDiffuse * lightColor * ramp;
+	c *= albedo;
+
 	half refl = MMDLit_SpecularRefl(normal, lightDir, viewDir, _Shininess);
-	c += (half3)_Specular * lightColor * refl;
-	#endif
-
-	#ifdef EMISSIVE_ON
-	// AutoLuminous
-	c += baseC * (half3)_Emissive;
-	#endif
+	c += (half3)_Specular * mmd_globalLighting * lightColor * refl;
 	return c;
 }
 
 // for FORWARD_ADD
 inline half3 MMDLit_Lighting_Add(
 	half3 albedo,
-	half NdotL,
+	half3 tempDiffuse,
 	half toonRefl,
 	half toonShadow,
+	half lambertStr,
+	half lambertAtten,
 	half3 normal,
 	half3 lightDir,
 	half3 viewDir,
 	half atten)
 {
-	half3 ramp = MMDLit_GetRamp_Add(toonRefl, toonShadow);
-	half3 lightColor = (half3)_LightColor0 * MMDLIT_ATTEN(atten);
+	half3 ramp = MMDLit_GetRamp_Add(toonRefl, toonShadow, lambertStr, lambertAtten);
+	half3 lightColor = (half3)_LightColor0 * atten * 2.0;
 
-	half3 baseC;
-	half3 baseD;
-	MMDLit_GetBaseColor(albedo, MMDLit_GetTempDiffuse_NoAmbient(), half3(0.0, 0.0, 0.0), baseC, baseD);
+	half c = tempDiffuse * lightColor * ramp;
+	c *= albedo;
 
-	half3 c = baseD * lightColor * ramp;
-
-	#ifdef SPECULAR_ON
 	half refl = MMDLit_SpecularRefl(normal, lightDir, viewDir, _Shininess);
-	c += (half3)_Specular * lightColor * refl;
-	#endif
-	
+	c += (half3)_Specular * mmd_globalLighting * lightColor * refl;
 	return c;
 }
 
@@ -221,4 +200,42 @@ inline half MMDLit_MulAtten(half atten, half shadowAtten)
 	return atten * shadowAtten;
 }
 
-#endif // MMDLIT_SURFACE_LIGHTING_INCLUDED
+inline half3 MMDLit_Lightmap(
+	half3 tempDiffuse,
+	half4 lmtex)
+{
+	half3 lm = MMDLit_DecodeLightmap(lmtex);
+	// lm = lightColor = _LightColor0.rgb * atten * 2.0
+	half3 ramp = MMDLit_GetRamp_Lightmap();
+
+	return tempDiffuse * lm * ramp + MMDLit_GetTempAmbient();
+}
+
+inline half3 MMDLit_DirLightmap(
+	half3 tempDiffuse,
+	half3 normal,
+	half4 color,
+	half4 scale,
+	half3 viewDir,
+	bool surfFuncWritesNormal,
+	out half3 specColor)
+{
+	UNITY_DIRBASIS
+	half3 scalePerBasisVector;
+	half3 lm = MMDLit_DirLightmapDiffuse (unity_DirBasis, color, scale, normal, surfFuncWritesNormal, scalePerBasisVector);
+	half3 lightDir = normalize(scalePerBasisVector.x * unity_DirBasis[0] + scalePerBasisVector.y * unity_DirBasis[1] + scalePerBasisVector.z * unity_DirBasis[2]);
+	// lm = lightColor = _LightColor0.rgb * atten * 2.0
+
+	half NdotL = dot(normal, lightDir);
+	half lambertStr = max(NdotL, 0.0);
+	half3 ramp = MMDLit_GetRamp_DirLightmap(NdotL, lambertStr);
+
+	half3 c = tempDiffuse * lm * ramp + MMDLit_GetTempAmbient();
+
+	half refl = MMDLit_SpecularRefl(normal, lightDir, viewDir, _Shininess);
+	specColor = (half3)_Specular * mmd_globalLighting * lm * refl;
+	return c;
+}
+
+#undef mmd_globalLighting
+#undef mmd_centerAmbient

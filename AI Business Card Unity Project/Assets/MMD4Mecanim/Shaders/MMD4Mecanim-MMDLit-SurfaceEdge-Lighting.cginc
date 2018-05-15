@@ -1,44 +1,28 @@
-// Not for redistribution without the author's express written permission
-#ifndef MMDLIT_SURFACEEDGE_LIGHTING_INCLUDED
-#define MMDLIT_SURFACEEDGE_LIGHTING_INCLUDED
+#define FIXED_EDGESIZE
 
-#include "MMD4Mecanim-MMDLit-Surface-Tessellation.cginc"
-#include "MMD4Mecanim-MMDLit-Compatible.cginc"
-
-half _AmbientToDiffuse;
 half4 _EdgeColor;
 float _EdgeSize;
 
-#define MMDLIT_GLOBALLIGHTING (0.6)
-#define MMDLIT_EDGE_ZOFST (0.00001)
+#define EDGE_BASESIZE 0.001
 
 inline float MMDLit_GetEdgeSize()
 {
-	return _EdgeSize;
+	return _EdgeSize * EDGE_BASESIZE;
 }
 
 inline float4 MMDLit_GetEdgeVertex(float4 vertex, float3 normal)
 {
-#if 1
+#ifdef FIXED_EDGESIZE
+	// Fixed size as MMD
 	float edge_size = MMDLit_GetEdgeSize();
 #else
 	// Adjust edge_size by distance & fovY
-	float4 world_pos = mul(MMDLit_GetMatrixMV(), vertex);
-	float r_proj_y = UNITY_MATRIX_P[1][1];
-	float edge_size = abs(MMDLit_GetEdgeSize() / r_proj_y * world_pos.z) * 2.0;
+	float4 world_pos = mul(UNITY_MATRIX_MV, vertex);
+	float r_proj_near = (-UNITY_MATRIX_P[3][2] - UNITY_MATRIX_P[2][2]) / UNITY_MATRIX_P[2][3];
+	float r_proj_y = UNITY_MATRIX_P[1][1] * r_proj_near * 0.5f;
+	float edge_size = abs(MMDLit_GetEdgeSize() / r_proj_y * world_pos.z * r_proj_near);
 #endif
-	return vertex + float4(normal.xyz * edge_size, 0.0);
-}
-
-inline float4 MMDLit_TransformEdgeVertex(float4 vertex)
-{
-#if 0
-	vertex = _UnityObjectToClipPos(vertex);
-	vertex.z += MMDLIT_EDGE_ZOFST * vertex.w;
-	return vertex;
-#else
-	return _UnityObjectToClipPos(vertex);
-#endif
+	return vertex + float4(normal.xyz * edge_size,0.0);
 }
 
 inline half3 MMDLit_GetAlbedo(out half alpha)
@@ -47,20 +31,7 @@ inline half3 MMDLit_GetAlbedo(out half alpha)
 	return (half3)_EdgeColor;
 }
 
-inline half3 MMDLit_Lighting(half3 albedo, half atten, half3 globalAmbient)
+inline half3 MMDLit_Lighting(half3 albedo, half atten)
 {
-	half3 color = (half3)_LightColor0 * MMDLIT_ATTEN(atten);
-	color *= MMDLIT_GLOBALLIGHTING;
-	#ifdef AMB2DIFF_ON
-	color *= saturate(globalAmbient * _AmbientToDiffuse); // Feedback ambient for Unity5.
-	#endif
-	#ifdef UNITY_PASS_FORWARDADD
-	// No Ambient.
-	#else
-	color += globalAmbient;
-	#endif
-	color *= albedo;
-	return color;
+	return albedo * (half3)_LightColor0 * atten * 2.0;
 }
-
-#endif // MMDLIT_SURFACEEDGE_LIGHTING_INCLUDED

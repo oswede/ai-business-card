@@ -1,4 +1,6 @@
-// Not for redistribution without the author's express written permission
+// Upgrade NOTE: replaced '_Object2World' with 'unity_ObjectToWorld'
+// Upgrade NOTE: replaced 'mul(UNITY_MATRIX_MVP,*)' with 'UnityObjectToClipPos(*)'
+
 #include "HLSLSupport.cginc"
 #include "UnityShaderVariables.cginc"
 #define UNITY_PASS_FORWARDADD
@@ -10,18 +12,18 @@
 #define WorldReflectionVector(data,normal) data.worldRefl
 #define WorldNormalVector(data,normal) normal
 
-#include "MMD4Mecanim-MMDLit-Lighting.cginc"
 #include "MMD4Mecanim-MMDLit-Surface-Lighting.cginc"
-#include "MMD4Mecanim-MMDLit-Compatible.cginc"
 
 struct v2f_surf
 {
 	float4 pos : SV_POSITION;
-	float4 pack0 : TEXCOORD0;
+	float2 pack0 : TEXCOORD0;
 	half3 normal : TEXCOORD1;
 	half4 lightDir : TEXCOORD2;
 	half4 viewDir : TEXCOORD3;
 	LIGHTING_COORDS(4,5)
+	half4 mmd_uvSpherePack : TEXCOORD6;
+	half4 mmd_tempDiffusePack : TEXCOORD7;
 };
 
 float4 _MainTex_ST;
@@ -29,78 +31,77 @@ float4 _MainTex_ST;
 v2f_surf vert_surf(appdata_full v)
 {
 	v2f_surf o;
-	o.pos = _UnityObjectToClipPos(v.vertex);
-	o.pack0.xy = v.texcoord.xy;
-	o.normal = mul((float3x3)_UNITY_OBJECT_TO_WORLD, SCALED_NORMAL);
+	o.pos = UnityObjectToClipPos(v.vertex);
+	o.pack0.xy = TRANSFORM_TEX(v.texcoord, _MainTex);
+	o.normal = mul((float3x3)unity_ObjectToWorld, SCALED_NORMAL);
+	half3 norm = normalize(mul((float3x3)UNITY_MATRIX_MV, v.normal));
+	half3 eye = normalize(mul(UNITY_MATRIX_MV, v.vertex).xyz);
+	half3 r = reflect(eye, norm);
+	half m = 2.0 * sqrt(r.x * r.x + r.y * r.y + (r.z + 1.0) * (r.z + 1.0));
+	o.mmd_uvSpherePack.xy = r.xy / m + 0.5;
+	o.mmd_tempDiffusePack.xyz = MMDLit_GetTempDiffuse();
 	o.lightDir.xyz = WorldSpaceLightDir(v.vertex);
 	o.viewDir.xyz = WorldSpaceViewDir(v.vertex);
-	half NdotL = dot(o.normal, (half3)o.lightDir);
+	half NdotL = dot(o.normal, o.lightDir);
 	half toonRefl = MMDLit_GetToolRefl(NdotL);
-	o.pack0.z = toonRefl;
-	o.pack0.w = MMDLit_GetForwardAddStr(toonRefl);
-	o.lightDir.w = 0.0;
+	half lambertStr = max(NdotL, 0.0);
+	o.mmd_uvSpherePack.z = toonRefl;
+	o.mmd_uvSpherePack.w = lambertStr;
+	o.mmd_tempDiffusePack.w = 1.0 - (1.0 - lambertStr) * _AddLambertStr; // addLambertStr
+	o.lightDir.w = MMDLit_GetLambertAtten(lambertStr);
 	o.viewDir.w = MMDLit_GetToonShadow(toonRefl);
 	TRANSFER_VERTEX_TO_FRAGMENT(o);
 	return o;
 }
 
-inline half3 frag_core(in v2f_surf IN, half4 albedo)
+inline half3 frag_core(in v2f_surf IN, half3 albedo)
 {
-	half atten = LIGHT_ATTENUATION(IN); // SHADOW_ATTENUATION() might be 1.0 (Can use LIGHT_ATTENUATION() only.)
+	half atten = LIGHT_ATTENUATION(IN);
 	#ifndef USING_DIRECTIONAL_LIGHT
 	half3 lightDir = normalize((half3)IN.lightDir);
 	#else
 	half3 lightDir = (half3)IN.lightDir;
 	#endif
 
-	half toonRefl = (half)IN.pack0.z;
-	half forwardAddStr = (half)IN.pack0.w;
+	half toonRefl = IN.mmd_uvSpherePack.z;
 	half toonShadow = IN.viewDir.w;
-	half NdotL = IN.lightDir.w;
-	half3 c = MMDLit_Lighting_Add(
-		(half3)albedo,
-		NdotL,
+	half lambertStr = IN.mmd_uvSpherePack.w;
+	half lambertAtten = IN.lightDir.w;
+	half3 c = MMDLit_Lighting_Add(albedo,
+		(half3)IN.mmd_tempDiffusePack,
 		toonRefl,
 		toonShadow,
+		lambertStr,
+		lambertAtten,
 		IN.normal,
 		(half3)lightDir,
 		normalize((half3)IN.viewDir),
 		atten);
-
-	c *= forwardAddStr;
+	#ifdef SUPPORT_ADDLAMBERTSTR
+	half addLambertStr = IN.mmd_tempDiffusePack.w;
+	c *= addLambertStr;
+	#endif
 	return c;
 }
 
-fixed4 frag_surf(v2f_surf IN) : MMDLIT_SV_TARGET
+fixed4 frag_surf(v2f_surf IN) : COLOR
 {
-	half4 albedo = MMDLit_GetAlbedo(IN.pack0.xy);
-	albedo.a *= _Color.a; // for Transparency
-	MMDLIT_CLIP(albedo.a)
+	half alpha;
+	half3 albedo = MMDLit_GetAlbedo(IN.pack0.xy, (half2)IN.mmd_uvSpherePack, alpha);
+	#if (defined(SHADER_API_GLES) && !defined(SHADER_API_GLES3)) && defined(SHADER_API_MOBILE)
+	// Fix: GPU Adreno 205(OpenGL ES 2.0) discard crash
+	#else
+	clip(alpha - (1.1 / 255.0)); // Simulate MMD
+	#endif
+
 	half3 c = frag_core(IN, albedo);
 	c = min(c, 1.0);
-	c *= albedo.a;
+	c *= alpha;
 	return fixed4(c, 0.0);
 }
 
-fixed4 frag_fast(v2f_surf IN) : MMDLIT_SV_TARGET
+fixed4 frag_fast(v2f_surf IN) : COLOR
 {
-	half4 albedo = MMDLit_GetAlbedo(IN.pack0.xy);
-	MMDLIT_CLIP_FAST(albedo.a)
-	half3 c = frag_core(IN, albedo);
+	half3 c = frag_core(IN, MMDLit_GetAlbedo(IN.pack0.xy, (half2)IN.mmd_uvSpherePack));
 	return fixed4(c, 0.0);
 }
-
-#ifdef TESSELLATION_ON
-#ifdef UNITY_CAN_COMPILE_TESSELLATION
-
-// tessellation domain shader
-[UNITY_domain("tri")]
-v2f_surf ds_surf(UnityTessellationFactors tessFactors, const OutputPatch<InternalTessInterp_appdata_full, 3> vi, float3 bary : SV_DomainLocation)
-{
-	appdata_full v = _ds_appdata_full(tessFactors, vi, bary);
-	v2f_surf o = vert_surf(v);
-	return o;
-}
-
-#endif // UNITY_CAN_COMPILE_TESSELLATION
-#endif // TESSELLATION_ON

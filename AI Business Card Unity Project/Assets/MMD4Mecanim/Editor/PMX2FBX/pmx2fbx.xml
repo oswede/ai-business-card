@@ -34,7 +34,7 @@
         <Rename> <from>腰</from> <to>Waist</to> </Rename>
         <Rename> <from>小指</from> <to>Pinky</to> </Rename>
         <Rename> <from>薬指</from> <to>Ring</to> </Rename>
-        <Rename> <from>中指</from> <to>Middle</to> </Rename>
+        <Rename> <from>中指</from> <to>Fingers</to> </Rename>
         <Rename> <from>人指</from> <to>Index</to> </Rename>
         <Rename> <from>人差指</from> <to>Index</to> </Rename>
         <Rename> <from>親指</from> <to>Thumb</to> </Rename>
@@ -118,7 +118,6 @@
         <Rename> <from>+</from> <to>+</to> </Rename>
         <Rename> <from>-</from> <to>-</to> </Rename>
         <Rename> <from>_</from> <to>_</to> </Rename>
-        <Rename> <from>/</from> <to>/</to> </Rename>
         <Rename> <from>０</from> <to>0</to> </Rename>
         <Rename> <from>１</from> <to>1</to> </Rename>
         <Rename> <from>２</from> <to>2</to> </Rename>
@@ -160,70 +159,5 @@
         <Rename> <from>＋</from> <to>+</to> </Rename>
         <Rename> <from>－</from> <to>-</to> </Rename>
         <Rename> <from>＿</from> <to>_</to> </Rename>
-        <Rename> <from>／</from> <to>/</to> </Rename>
     </renameList>
-    <morphRenameList>
-        <Rename> <from>コッチミンナ</from> <to>DontLook</to> </Rename>
-        <Rename> <from>メガネ</from> <to>Glasses</to> </Rename>
-        <Rename> <from>めがね</from> <to>Glasses</to> </Rename>
-        <Rename> <from>眼鏡</from> <to>Glasses</to> </Rename>
-        <Rename> <from>にやり</from> <to>Grinning</to> </Rename>
-        <Rename> <from>まばたき</from> <to>Blink</to> </Rename>
-        <Rename> <from>ウインク</from> <to>Wink</to> </Rename>
-        <Rename> <from>ウィンク</from> <to>Wink</to> </Rename>
-        <Rename> <from>ｳｲﾝｸ</from> <to>Wink</to> </Rename>
-        <Rename> <from>ｳｨﾝｸ</from> <to>Wink</to> </Rename>
-        <Rename> <from>ビックリ</from> <to>Surprise</to> </Rename>
-        <Rename> <from>びっくり</from> <to>Surprise</to> </Rename>
-        <Rename> <from>てへぺろ</from> <to>Tehepero</to> </Rename>
-        <Rename> <from>ぺろっ</from> <to>Pero</to> </Rename>
-        <Rename> <from>にっこり</from> <to>VerySmiley</to> </Rename>
-        <Rename> <from>にこり</from> <to>Smiley</to> </Rename>
-        <Rename> <from>にやける</from> <to>Smirk</to> </Rename>
-        <Rename> <from>真面目</from> <to>Seriously</to> </Rename>
-        <Rename> <from>怒り</from> <to>Angry</to> </Rename>
-        <Rename> <from>困る</from> <to>Worry</to> </Rename>
-        <Rename> <from>笑い</from> <to>Laughing</to> </Rename>
-        <Rename> <from>笑う</from> <to>Laugh</to> </Rename>
-        <Rename> <from>まゆ</from> <to>Brow</to> </Rename>
-        <Rename> <from>ひどく</from> <to>Very</to> </Rename>
-        <Rename> <from>大きく</from> <to>Big</to> </Rename>
-        <Rename> <from>太く</from> <to>Thick</to> </Rename>
-        <Rename> <from>短く</from> <to>Thin</to> </Rename>
-        <Rename> <from>繊細</from> <to>Delicate</to> </Rename>
-        <Rename> <from>内側へ</from> <to>ToInner</to> </Rename>
-        <Rename> <from>前へ</from> <to>ToFront</to> </Rename>
-        <Rename> <from>回転</from> <to>Rotate</to> </Rename>
-        <Rename> <from>拡大</from> <to>Expansion</to> </Rename>
-        <Rename> <from>縮小</from> <to>Reduction</to> </Rename>
-        <Rename> <from>瞳</from> <to>Pupil</to> </Rename>
-        <Rename> <from>目</from> <to>Eyes</to> </Rename>
-        <Rename> <from>はぅ</from> <to>Hau</to> </Rename>
-        <Rename> <from>むぅ</from> <to>Muu</to> </Rename>
-        <Rename> <from>むっ</from> <to>Mu</to> </Rename>
-        <Rename> <from>ちゅう</from> <to>Kiss</to> </Rename>
-        <Rename> <from>涙</from> <to>Tear</to> </Rename>
-        <Rename> <from>なごみ</from> <to>Calm</to> </Rename>
-        <Rename> <from>きゃっ</from> <to>Shriek</to> </Rename>
-        <Rename> <from>消す</from> <to>Off</to> </Rename>
-        <Rename> <from>消し</from> <to>Off</to> </Rename>
-        <Rename> <from>消</from> <to>Off</to> </Rename>
-        <Rename> <from>キリッ</from> <to>Kiri</to> </Rename>
-        <Rename> <from>ｷﾘｯ</from> <to>Kiri</to> </Rename>
-        <Rename> <from>ω</from> <to>Omega</to> </Rename>
-        <Rename> <from>▲</from> <to>Triangle</to> </Rename>
-        <Rename> <from>∧</from> <to>ClosedTriangle</to> </Rename>
-        <Rename> <from>■</from> <to>Rect</to> </Rename>
-        <Rename> <from>□</from> <to>Rect</to> </Rename>
-        <Rename> <from>上</from> <to>Up</to> </Rename>
-        <Rename> <from>下</from> <to>Down</to> </Rename>
-        <Rename> <from>細目</from> <to>ThinEyes</to> </Rename>
-        <Rename> <from>丸目</from> <to>RoundEyes</to> </Rename>
-        <Rename> <from>はちゅ目</from> <to>HachuEyes</to> </Rename>
-        <Rename> <from>じと目</from> <to>JitoEyes</to> </Rename>
-        <Rename> <from>つり目</from> <to>TsuriEyes</to> </Rename>
-        <Rename> <from>たれ目</from> <to>TareEyes</to> </Rename>
-        <Rename> <from>縦潰れ</from> <to>Vert</to> </Rename>
-        <Rename> <from>横潰れ</from> <to>Horz</to> </Rename>
-    </morphRenameList>
 </PMX2FBXConfig>

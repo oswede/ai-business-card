@@ -1,5 +1,4 @@
-﻿// - Don't upload model data, motion data, this code in github or public space without permission.
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.IO;
 using System.Collections;
@@ -11,13 +10,7 @@ using MorphType			= MMD4MecanimData.MorphType;
 using MorphData			= MMD4MecanimData.MorphData;
 using MorphMotionData	= MMD4MecanimData.MorphMotionData;
 
-using AnimData			= MMD4MecanimData.AnimData;
-using IAnim				= MMD4MecanimAnim.IAnim;
-using IMorph			= MMD4MecanimAnim.IMorph;
-using IAnimModel		= MMD4MecanimAnim.IAnimModel;
-using MorphMotion		= MMD4MecanimAnim.MorphMotion;
-
-public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
+public class MMD4MecanimAnimMorphHelper : MonoBehaviour
 {
 	public string							animName = "";
 	public string							playingAnimName = "";
@@ -30,52 +23,23 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 	public bool								overrideWeight = false;
 
 	[System.Serializable]
-	public class Anim : IAnim
+	public class Anim
 	{
 		public string						animName;
 		public TextAsset					animFile;
 		public AudioClip					audioClip;
 		
 		[NonSerialized]
-		public AnimData						animData;
+		public MMD4MecanimData.AnimData		animData;
+
+		public struct MorphMotion
+		{
+			public MMD4MecanimModel.Morph	morph;
+			public int						lastKeyFrameIndex;
+		}
+		
 		[NonSerialized]
 		public MorphMotion[]				morphMotionList;
-
-		string IAnim.animatorStateName // Memo: Not supported animatorStateName
-		{
-			get { return null; }
-			set {}
-		}
-		
-		int IAnim.animatorStateNameHash // Memo: Not supported animatorStateNameHash
-		{
-			get { return 0; }
-			set {}
-		}
-		
-		TextAsset IAnim.animFile
-		{
-			get { return this.animFile; }
-			set { this.animFile = value; }
-		}
-		
-		AudioClip IAnim.audioClip
-		{
-			get { return this.audioClip; }
-			set { this.audioClip = value; }
-		}
-		
-		AnimData IAnim.animData
-		{
-			get { return this.animData; }
-			set { this.animData = value; }
-		}
-		
-		MorphMotion[] IAnim.morphMotionList
-		{
-			get { return this.morphMotionList; }
-			set { this.morphMotionList = value; }
-		}
 	}
 
 	public Anim[]							animList;
@@ -83,7 +47,8 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 	private bool							_initialized;
 	private MMD4MecanimModel				_model;
 	private AudioSource						_audioSource;
-	private Anim							_playingAnim;
+	private Anim							_currentAnim;
+	private Anim							_playingAudioAnim;
 	private float							_animTime;
 	private float							_morphWeight;
 	private float							_weight2;
@@ -127,115 +92,6 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 		this.playingAnimName = "";
 	}
 
-	//------------------------------------------------------------------------------------------------------------
-
-	IMorph IAnimModel.GetMorph( string name )
-	{
-		// Memo: Redirect to MMD4MecanimModel
-		if( _model != null ) {
-			return _model.GetMorph( name );
-		}
-		return null;
-	}
-	
-	IMorph IAnimModel.GetMorph( string name, bool startsWith )
-	{
-		// Memo: Redirect to MMD4MecanimModel
-		if( _model != null ) {
-			return _model.GetMorph( name, startsWith );
-		}
-		return null;
-	}
-	
-	int IAnimModel.morphCount
-	{
-		get
-		{
-			// Memo: Redirect to MMD4MecanimModel
-			if( _model != null && _model.morphList != null ) {
-				return _model.morphList.Length;
-			}
-
-			return 0;
-		}
-	}
-	
-	IMorph IAnimModel.GetMorphAt( int index )
-	{
-		// Memo: Redirect to MMD4MecanimModel
-		if( _model != null && _model.morphList != null ) {
-			if( index >= 0 && index < _model.morphList.Length ) {
-				return _model.morphList[index];
-			}
-		}
-		
-		return null;
-	}
-	
-	int IAnimModel.animCount
-	{
-		get
-		{
-			if( this.animList != null ) {
-				return this.animList.Length;
-			}
-			
-			return 0;
-		}
-	}
-	
-	IAnim IAnimModel.GetAnimAt( int index )
-	{
-		if( this.animList != null ) {
-			if( index >= 0 && index < this.animList.Length ) {
-				return this.animList[index];
-			}
-		}
-		
-		return null;
-	}
-	
-	Animator IAnimModel.animator // Memo: Not supported animator
-	{
-		get { return null; }
-	}
-	
-	AudioSource IAnimModel.audioSource
-	{
-		get
-		{
-			if( _audioSource == null ) {
-				_audioSource = MMD4MecanimCommon.WeakAddComponent< AudioSource >( this.gameObject );
-			}
-			
-			return _audioSource;
-		}
-	}
-	
-	bool IAnimModel.animSyncToAudio
-	{
-		get { return this.animSyncToAudio; }
-	}
-	
-	float IAnimModel.prevDeltaTime // Memo: Require _SyncToAudio & animator
-	{
-		get { return 0.0f; }
-		set {}
-	}
-	
-	IAnim IAnimModel.playingAnim
-	{
-		get { return _playingAnim; }
-		set { _playingAnim = (Anim)value; }
-	}
-	
-	void IAnimModel._SetAnimMorphWeight( IMorph morph, float weight )
-	{
-		morph.weight = (_morphWeight != 1.0f) ? (weight * _morphWeight) : weight;
-	}
-
-	//------------------------------------------------------------------------------------------------------------
-
 	void Awake()
 	{
 		if( this.initializeOnAwake ) {
@@ -251,6 +107,7 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 	void Update()
 	{
 		_UpdateAnim();
+		_UpdateAnim2();
 		_UpdateMorph();
 	}
 
@@ -268,7 +125,37 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 
 		_model.Initialize();
 
-		MMD4MecanimAnim.InitializeAnimModel( this );
+		bool isEnableAudioClip = false;
+		if( this.animList != null ) {
+			for( int i = 0; i < this.animList.Length; ++i ) {
+				_InitializeAnim( this.animList[i] );
+				isEnableAudioClip |= (this.animList[i].audioClip != null);
+			}
+		}
+
+		if( isEnableAudioClip ) {
+			_audioSource = _model.GetAudioSource();
+		}
+	}
+
+	void _InitializeAnim( Anim anim )
+	{
+		if( anim == null || _model == null || _model.modelData == null || _model.morphList == null ) {
+			return;
+		}
+
+		anim.animData = MMD4MecanimData.BuildAnimData( anim.animFile );
+		if( anim.animData == null ) {
+			return;
+		}
+
+		MMD4MecanimData.MorphMotionData[] morphMotionData = anim.animData.morphMotionDataList;
+		if( morphMotionData != null ) {
+			anim.morphMotionList = new MMD4MecanimAnimMorphHelper.Anim.MorphMotion[morphMotionData.Length];
+			for( int n = 0; n < morphMotionData.Length; ++n ) {
+				anim.morphMotionList[n].morph = _model.GetMorph( morphMotionData[n].name, true );
+			}
+		}
 	}
 
 	void _UpdateAnim()
@@ -277,97 +164,187 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 			_StopAnim();
 			return;
 		}
-
-		if( _playingAnim != null ) {
+		if( _currentAnim != null ) {
 			if( string.IsNullOrEmpty(this.playingAnimName) ||
-				_playingAnim.animName == null || this.playingAnimName != _playingAnim.animName ) {
+			   _currentAnim.animName == null || this.playingAnimName != _currentAnim.animName ) {
 				_StopAnim();
 			}
 		}
-
-		bool updatedAnimModel = false;
-		if( _playingAnim == null && !string.IsNullOrEmpty(this.animName) ) {
+		if( _currentAnim == null && !string.IsNullOrEmpty(this.animName) ) {
 			if( this.animList != null ) {
-				for( int i = 0; i != this.animList.Length; ++i ) {
+				for( int i = 0; i < this.animList.Length; ++i ) {
 					if( this.animList[i].animName != null && this.animList[i].animName == this.animName ) {
 						_PlayAnim( this.animList[i] );
-						updatedAnimModel = true;
 						break;
 					}
 				}
 			}
 		}
-
-		if( _playingAnim != null ) {
-			if( _playingAnim.animData != null ) {
+		if( _currentAnim != null ) {
+			if( _currentAnim.animData != null ) {
 				if( !this.animPauseOnEnd ) {
-					if( _animTime >= (float)(_playingAnim.animData.maxFrame - 1) / 30.0f ) { // Bugfix
+					if( _animTime == (float)(_currentAnim.animData.maxFrame / 30.0f) ) {
 						_StopAnim();
 					}
 				}
-			} else { // Failsafe.
+			} else {
 				_StopAnim();
 			}
 		}
-
-		if( _playingAnim == null ) {
+		if( _currentAnim == null ) {
 			return;
 		}
 
-		if( !updatedAnimModel ) {
-			MMD4MecanimAnim.UpdateAnimModel( this, _playingAnim, _animTime );
+		if( _playingAudioAnim != null && _playingAudioAnim != _currentAnim ) {
+			if( _audioSource != null ) {
+				if( _audioSource.clip == _playingAudioAnim.audioClip ) {
+					_audioSource.Stop();
+					_audioSource.clip = null;
+				}
+			}
+			_playingAudioAnim = null;
 		}
-
-		if( _playingAnim != null ) {
-			// Postfix for animWeight2
-			if( _playingAnim.morphMotionList != null ) {
-				for( int i = 0; i != _playingAnim.morphMotionList.Length; ++i ) {
-					if( _playingAnim.morphMotionList[i].morph != null ) {
-						((Morph)_playingAnim.morphMotionList[i].morph).weight2 = _weight2;
+		
+		if( _playingAudioAnim == null && _currentAnim.audioClip != null ) {
+			_playingAudioAnim = _currentAnim;
+			if( _audioSource != null ) {
+				if( _audioSource.clip != _playingAudioAnim.audioClip ) {
+					_audioSource.clip = _playingAudioAnim.audioClip;
+					_audioSource.Play();
+				} else {
+					if( !_audioSource.isPlaying ) {
+						_audioSource.Play();
 					}
 				}
 			}
+		}
 
-			if( _playingAnim.audioClip != null && _audioSource != null && _audioSource.isPlaying && this.animSyncToAudio ) {
-				_animTime = _audioSource.time;
-			} else {
-				_animTime += Time.deltaTime;
-			}
+		float f_frameNo = _animTime * 30.0f;
+		int frameNo = (int)f_frameNo;
 
-			if( _playingAnim.animData != null ) {
-				_animTime = Mathf.Min( _animTime, (float)_playingAnim.animData.maxFrame / 30.0f );
-			} else {
-				_animTime = 0.0f;
+		for( int i = 0; i < _currentAnim.morphMotionList.Length; ++i ) {
+			Anim.MorphMotion morphMotion = _currentAnim.morphMotionList[i];
+			MorphMotionData morphMotionData = _currentAnim.animData.morphMotionDataList[i];
+			if( morphMotion.morph == null ) {
+				continue;
 			}
+			if( morphMotionData.frameNos == null ||
+			    morphMotionData.f_frameNos == null ||
+			    morphMotionData.weights == null ) {
+				continue;
+			}
+			
+			if( morphMotion.lastKeyFrameIndex < morphMotionData.frameNos.Length &&
+			    morphMotionData.frameNos[morphMotion.lastKeyFrameIndex] > frameNo ) {
+				morphMotion.lastKeyFrameIndex = 0;
+			}
+			
+			bool isProcessed = false;
+			for( int keyFrameIndex = morphMotion.lastKeyFrameIndex; keyFrameIndex < morphMotionData.frameNos.Length; ++keyFrameIndex ) {
+				int keyFrameNo = morphMotionData.frameNos[keyFrameIndex];
+				if( frameNo >= keyFrameNo ) {
+					morphMotion.lastKeyFrameIndex = keyFrameIndex;
+				} else {
+					if( morphMotion.lastKeyFrameIndex + 1 < morphMotionData.frameNos.Length ) {
+						_ProcessKeyFrame2( morphMotion.morph, morphMotionData,
+						                  morphMotion.lastKeyFrameIndex + 0,
+						                  morphMotion.lastKeyFrameIndex + 1,
+						                  frameNo, f_frameNo );
+					}
+					isProcessed = true;
+					break;
+				}
+			}
+			if( !isProcessed ) {
+				if( morphMotion.lastKeyFrameIndex < morphMotionData.frameNos.Length ) {
+					_ProcessKeyFrame( morphMotion.morph, morphMotionData,
+					                 morphMotion.lastKeyFrameIndex );
+				}
+			}
+		}
+
+		// Postfix for animWeight2
+		if( _currentAnim.morphMotionList != null ) {
+			for( int i = 0; i < _currentAnim.morphMotionList.Length; ++i ) {
+				if( _currentAnim.morphMotionList[i].morph != null ) {
+					_currentAnim.morphMotionList[i].morph.weight2 = _weight2;
+				}
+			}
+		}
+
+		if( _currentAnim.audioClip != null && _audioSource != null && _audioSource.isPlaying && this.animSyncToAudio ) {
+			_animTime = _audioSource.time;
+		} else {
+			_animTime += Time.deltaTime;
+		}
+
+		if( _currentAnim.animData != null ) {
+			_animTime = Mathf.Min( _animTime, (float)(_currentAnim.animData.maxFrame / 30.0f) );
+		} else {
+			_animTime = 0.0f;
 		}
 	}
 
 	bool _IsPlayingAnim()
 	{
-		if( _playingAnim != null && _playingAnim.animData != null ) {
-			return _animTime < (float)(_playingAnim.animData.maxFrame - 1) / 30.0f; // Bugfix
+		if( _currentAnim != null && _currentAnim.animData != null ) {
+			return _animTime < (float)(_currentAnim.animData.maxFrame / 30.0f);
 		}
 
 		return false;
 	}
 
+	void _ProcessKeyFrame2(
+		Morph morph, MorphMotionData motionMorphData,
+		int keyFrameIndex0,
+		int keyFrameIndex1,
+		int frameNo, float f_frameNo )
+	{
+		int frameNo0 = motionMorphData.frameNos[keyFrameIndex0];
+		int frameNo1 = motionMorphData.frameNos[keyFrameIndex1];
+		float f_frameNo0 = motionMorphData.f_frameNos[keyFrameIndex0];
+		float f_frameNo1 = motionMorphData.f_frameNos[keyFrameIndex1];
+		if( frameNo <= frameNo0 || frameNo1 - frameNo0 == 1 ) { /* memo: Don't interpolate adjacent keyframes. */
+			morph.weight = motionMorphData.weights[keyFrameIndex0];
+		} else if( frameNo >= frameNo1 ) {
+			morph.weight = motionMorphData.weights[keyFrameIndex1];
+		} else {
+			float r1 = (f_frameNo - f_frameNo0) / (f_frameNo1 - f_frameNo0);
+			r1 = Mathf.Clamp( r1, 0.0f, 1.0f );
+			float r0 = 1.0f - r1;
+			morph.weight =
+				motionMorphData.weights[keyFrameIndex0] * r0 +
+					motionMorphData.weights[keyFrameIndex1] * r1;
+		}
+		if( _morphWeight != 1.0f ) {
+			morph.weight *= _morphWeight;
+		}
+	}
+	
+	void _ProcessKeyFrame( Morph morph, MorphMotionData motionMorphData, int keyFrameIndex )
+	{
+		morph.weight = motionMorphData.weights[keyFrameIndex];
+		if( _morphWeight != 1.0f ) {
+			morph.weight *= _morphWeight;
+		}
+	}
+
 	void _PlayAnim( Anim anim )
 	{
-		_StopAnim(); // _playingAnim = null;
+		_StopAnim();
 
+		_currentAnim = anim;
 		_animTime = 0.0f;
 		this.animName = "";
 		if( anim != null ) {
 			this.playingAnimName = anim.animName;
 		}
 
-		MMD4MecanimAnim.UpdateAnimModel( this, anim, _animTime ); // _playingAnim = anim;
-
-		if( _playingAnim != null && _inactiveModelMorphSet != null ) {
-			if( _playingAnim.morphMotionList != null ) {
-				for( int i = 0; i != _playingAnim.morphMotionList.Length; ++i ) {
-					_playingAnim.morphMotionList[i].lastKeyFrameIndex = 0;
-					Morph morph = (Morph)(_playingAnim.morphMotionList[i].morph);
+		if( _currentAnim != null && _inactiveModelMorphSet != null ) {
+			if( _currentAnim.morphMotionList != null ) {
+				for( int i = 0; i < _currentAnim.morphMotionList.Length; ++i ) {
+					_currentAnim.morphMotionList[i].lastKeyFrameIndex = 0;
+					MMD4MecanimModel.Morph morph = _currentAnim.morphMotionList[i].morph;
 					if( morph != null ) {
 						_inactiveModelMorphSet.Remove( morph );
 					}
@@ -378,23 +355,36 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 
 	void _StopAnim()
 	{
-		if( _playingAnim != null && _inactiveModelMorphSet != null ) {
-			if( _playingAnim.morphMotionList != null ) {
-				for( int i = 0; i != _playingAnim.morphMotionList.Length; ++i ) {
-					_playingAnim.morphMotionList[i].lastKeyFrameIndex = 0;
-					Morph morph = (Morph)(_playingAnim.morphMotionList[i].morph);
+		this.playingAnimName = "";
+
+		if( _currentAnim != null && _inactiveModelMorphSet != null ) {
+			if( _currentAnim.morphMotionList != null ) {
+				for( int i = 0; i < _currentAnim.morphMotionList.Length; ++i ) {
+					_currentAnim.morphMotionList[i].lastKeyFrameIndex = 0;
+					MMD4MecanimModel.Morph morph = _currentAnim.morphMotionList[i].morph;
 					if( morph != null && (morph.weight != 0.0f || morph.weight2 != 0.0f) ) {
 						_inactiveModelMorphSet.Add( morph );
 					}
 				}
 			}
+			_currentAnim = null;
+			_animTime = 0.0f;
 		}
-		
-		MMD4MecanimAnim.StopAnimModel( this ); // _playingAnim = null;
-		_animTime = 0.0f;
-		this.playingAnimName = "";
 	}
-	
+
+	void _UpdateAnim2()
+	{
+		if( _playingAudioAnim != null && _currentAnim == null ) {
+			if( _audioSource != null ) {
+				if( _audioSource.clip == _playingAudioAnim.audioClip ) {
+					_audioSource.Stop();
+					_audioSource.clip = null;
+				}
+			}
+			_playingAudioAnim = null;
+		}
+	}
+
 	void _UpdateMorph()
 	{
 		float stepValue = 1.0f;
@@ -402,11 +392,10 @@ public class MMD4MecanimAnimMorphHelper : MonoBehaviour, IAnimModel
 			stepValue = Time.deltaTime / this.morphSpeed;
 		}
 
-		if( _playingAnim != null ) {
+		if( _currentAnim != null ) {
 			MMD4MecanimCommon.Approx( ref _morphWeight, 1.0f, stepValue );
 			MMD4MecanimCommon.Approx( ref _weight2, this.overrideWeight ? 1.0f : 0.0f, stepValue );
 		} else {
-			MMD4MecanimCommon.Approx( ref _morphWeight, 0.0f, stepValue );
 			MMD4MecanimCommon.Approx( ref _weight2, 0.0f, stepValue );
 		}
 		if( _inactiveModelMorphSet != null ) {

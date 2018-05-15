@@ -1,47 +1,32 @@
-// Not for redistribution without the author's express written permission
 Shader "MMD4Mecanim/MMDLit-Dummy"
 {
-	SubShader {
-		Tags { "Queue" = "Background-1000" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
-		LOD 200
+	Properties
+	{
+		_Color("Diffuse", Color) = (1,1,1,1)
+		_Specular("Specular", Color) = (1,1,1)
+		_Ambient("Ambient", Color) = (1,1,1)
+		_Shininess("Shininess", Float) = 0
+		_ShadowLum("ShadowLum", Range(0,10)) = 1.5
+		_SelfShadowStr("SelfShadowStr", Range(0,1)) = 1.0
+		_LambertStr("LambertStr", Range(0,1)) = 0.0
+		_AddLambertStr("AddLambertStr", Range(0,1)) = 0.0
+		_EdgeColor("EdgeColor", Color) = (0,0,0,1)
+		_EdgeSize("EdgeSize", Range(0,2)) = 0.0
+		_MainTex("MainTex", 2D) = "white" {}
+		_ToonTex("ToonTex", 2D) = "white" {}
+		_SphereAddMul("SphereAddMul", Range(0,1)) = 1.0
+		_SphereMulMul("SphereMulMul", Range(0,1)) = 1.0
+		_SphereAddTex("SphereAddTex", 2D) = "black" {}
+		_SphereMulTex("SphereMulTex", 2D) = "white" {}
 
-		Pass { // No effeects.(Removed by ForceNoShadowCasting = True)
-			Name "ShadowCaster"
-			Tags { "LightMode" = "ShadowCaster" }
-			Fog { Mode Off }
+		_DefLightDir("DefLightDir",Vector) = (0,0,1,1)
+		_DefLightAtten("DefLightAtten",Float) = 0.5
+		_DefLightColor0("DefLightColor0", Color) = (1,1,1,1)
 
-			ZTest Equal
-			ZWrite Off
-			Cull Off
-			Lighting Off
-			Blend Off
-			ColorMask 0
-
-			CGPROGRAM
-			#pragma target 2.0
-			#pragma vertex vert
-			#pragma fragment frag
-			#include "UnityCG.cginc"
-			#include "MMD4Mecanim-MMDLit-Lighting.cginc"
-
-			struct v2f {
-			    float4 pos : SV_POSITION;
-			};
-
-			v2f vert(appdata_base v)
-			{
-				v2f o;
-				o.pos = half4(0,0,-2,1);
-				return o;
-			}
-
-			half4 frag (v2f i) : MMDLIT_SV_TARGET
-			{
-				return half4(0,0,0,0);
-			}
-			ENDCG
-	    }
+		_DefSA2CTex("DefSA2CTex", 2D) = "black" {}
+		_DefSA2CSize("DefSA2CSize", float) = 1.0
+		_DefClearColor("DefClearColor", Color) = (0,0,0,0)
 	}
 
-	Fallback Off
+	Fallback "Diffuse"
 }

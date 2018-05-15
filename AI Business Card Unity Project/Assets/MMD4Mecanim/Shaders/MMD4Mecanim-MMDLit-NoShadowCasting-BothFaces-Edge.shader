@@ -1,48 +1,72 @@
-// Not for redistribution without the author's express written permission
 Shader "MMD4Mecanim/MMDLit-NoShadowCasting-BothFaces-Edge"
 {
 	Properties
 	{
 		_Color("Diffuse", Color) = (1,1,1,1)
-		_Specular("Specular", Color) = (1,1,1) // Memo: Postfix from material.(Revision>=0)
+		_Specular("Specular", Color) = (1,1,1)
 		_Ambient("Ambient", Color) = (1,1,1)
 		_Shininess("Shininess", Float) = 0
 		_ShadowLum("ShadowLum", Range(0,10)) = 1.5
-		_AmbientToDiffuse("AmbientToDiffuse", Float) = 5
+		_SelfShadowStr("SelfShadowStr", Range(0,1)) = 1.0
+		_LambertStr("LambertStr", Range(0,1)) = 0.0
+		_AddLambertStr("AddLambertStr", Range(0,1)) = 0.0
 		_EdgeColor("EdgeColor", Color) = (0,0,0,1)
-		_EdgeScale("EdgeScale", Range(0,2)) = 0 // Memo: Postfix from material.(Revision>=0)
-		_EdgeSize("EdgeSize", float) = 0 // Memo: Postfix from material.(Revision>=0)
+		_EdgeSize("EdgeSize", Range(0,2)) = 0.0
 		_MainTex("MainTex", 2D) = "white" {}
 		_ToonTex("ToonTex", 2D) = "white" {}
+		_SphereAddMul("SphereAddMul", Range(0,1)) = 1.0
+		_SphereMulMul("SphereMulMul", Range(0,1)) = 1.0
+		_SphereAddTex("SphereAddTex", 2D) = "black" {}
+		_SphereMulTex("SphereMulTex", 2D) = "white" {}
 
-		_SphereCube("SphereCube", Cube) = "white" {} // Memo: Postfix from material.(Revision>=0)
+		_DefLightDir("DefLightDir",Vector) = (0,0,1,1)
+		_DefLightAtten("DefLightAtten",Float) = 0.5
+		_DefLightColor0("DefLightColor0", Color) = (1,1,1,1)
 
-		_Emissive("Emissive", Color) = (0,0,0,0)
-		_ALPower("ALPower", Float) = 0
-
-		_AddLightToonCen("AddLightToonCen", Float) = -0.1
-		_AddLightToonMin("AddLightToonMin", Float) = 0.5
-
-		_ToonTone("ToonTone", Vector) = (1.0, 0.5, 0.5, 0.0) // ToonTone, ToonTone / 2, ToonToneAdd, Unused
-
-		_NoShadowCasting("__NoShadowCasting", Float) = 1.0
-
-		_TessEdgeLength("Tess Edge length", Range(2,50)) = 5
-		_TessPhongStrength("Tess Phong Strengh", Range(0,1)) = 0.5
-		_TessExtrusionAmount("TessExtrusionAmount", Float) = 0.0
-
-		_Revision("Revision",Float) = -1.0 // Memo: Shader setting trigger.(Reset to 0<=)
+		_DefSA2CTex("DefSA2CTex", 2D) = "black" {}
+		_DefSA2CSize("DefSA2CSize", float) = 1.0
+		_DefClearColor("DefClearColor", Color) = (0,0,0,0)
 	}
 
 	SubShader
 	{
-		Tags { "Queue" = "Geometry+1" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
+		Tags { "Queue" = "Geometry" "RenderType" = "Opaque" "ForceNoShadowCasting" = "True" }
 		LOD 200
 
-		UsePass "MMD4Mecanim/MMDLit-BothFaces/FORWARD"
-		UsePass "MMD4Mecanim/MMDLit-BothFaces/FORWARD_DELTA"
-
 		Cull Off
+		ZWrite On
+		Blend Off
+
+		Pass {
+			Name "FORWARD"
+			Tags { "LightMode" = "ForwardBase" }
+
+			CGPROGRAM
+			#pragma target 2.0
+			#pragma exclude_renderers flash
+			#pragma vertex vert_surf
+			#pragma fragment frag_fast
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_fwdbase
+			#include "MMD4Mecanim-MMDLit-Surface-ForwardBase.cginc"
+			ENDCG
+		}
+
+		Pass {
+			Name "FORWARD"
+			Tags { "LightMode" = "ForwardAdd" }
+
+			ZWrite Off Blend One One Fog { Color (0,0,0,0) }
+			CGPROGRAM
+			#pragma target 2.0
+			#pragma exclude_renderers flash
+			#pragma vertex vert_surf
+			#pragma fragment frag_fast
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_fwdadd
+			#include "MMD4Mecanim-MMDLit-Surface-ForwardAdd.cginc"
+			ENDCG
+		}
 
 		Pass {
 			Name "ShadowCaster"
@@ -54,7 +78,7 @@ Shader "MMD4Mecanim/MMDLit-NoShadowCasting-BothFaces-Edge"
 			#pragma target 2.0
 			#pragma exclude_renderers flash
 			#pragma vertex vert_surf
-			#pragma fragment frag_fast
+			#pragma fragment frag_surf
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#pragma multi_compile_shadowcaster
 			#include "MMD4Mecanim-MMDLit-Surface-ShadowCaster.cginc"
@@ -70,17 +94,49 @@ Shader "MMD4Mecanim/MMDLit-NoShadowCasting-BothFaces-Edge"
 			#pragma target 2.0
 			#pragma exclude_renderers flash
 			#pragma vertex vert_surf
-			#pragma fragment frag_fast
+			#pragma fragment frag_surf
 			#pragma fragmentoption ARB_precision_hint_fastest
 			#pragma multi_compile_shadowcollector
 			#include "MMD4Mecanim-MMDLit-Surface-ShadowCollector.cginc"
 			ENDCG
 		}
 
-		UsePass "MMD4Mecanim/MMDLit-Edge/FORWARD_EDGE"
-		UsePass "MMD4Mecanim/MMDLit-Edge/FORWARD_EDGE_DELTA"
+		Cull Front
+		ZWrite On
+		Blend SrcAlpha OneMinusSrcAlpha
+		ColorMask RGB
+
+		Pass {
+			Name "FORWARD"
+			Tags { "LightMode" = "ForwardBase" }
+
+			CGPROGRAM
+			#pragma target 2.0
+			#pragma exclude_renderers flash
+			#pragma vertex vert_surf
+			#pragma fragment frag_surf
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_fwdbase
+			#include "MMD4Mecanim-MMDLit-SurfaceEdge-ForwardBase.cginc"
+			ENDCG
+		}
+
+		Pass {
+			Name "FORWARD"
+			Tags { "LightMode" = "ForwardAdd" }
+
+			ZWrite Off Blend One One Fog { Color (0,0,0,0) }
+			CGPROGRAM
+			#pragma target 2.0
+			#pragma exclude_renderers flash
+			#pragma vertex vert_surf
+			#pragma fragment frag_surf
+			#pragma fragmentoption ARB_precision_hint_fastest
+			#pragma multi_compile_fwdadd
+			#include "MMD4Mecanim-MMDLit-SurfaceEdge-ForwardAdd.cginc"
+			ENDCG
+		}
 	}
 
 	Fallback Off
-	CustomEditor "MMD4MecanimMaterialInspector"
 }
