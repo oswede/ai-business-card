@@ -1,7 +1,7 @@
-# AI Business Card
+5# AI Business Card
 
 ## Messages for Team
-CURRENT VERSION OF CODE ON BRANCH: Prototype4
+CURRENT VERSION OF CODE ON BRANCH: Prototype5
 
 ## Project Description
 Our Project is to design and build an intelligent AR Business Card. We will be using Watson Conversations to build a chatbot that guides the user through a conversation about John McNamara, a Senior Inventor and Innovation Centre Technologist Lead at IBM.
